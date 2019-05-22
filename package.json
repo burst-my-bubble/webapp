@@ -5,8 +5,17 @@
     "type": "git",
     "url": "git@gitlab.doc.ic.ac.uk:BurstMyBubble/webapp.git"
   },
+  "description": "An awesome webapp",
+  "license": "UNLICENSED",
+  "private": "true",
+  "scripts": {
+    "build": "webpack --mode development"
+  },
   "author": "Joe Rackham, Jack Morrison, Hugo Mayo, Hashan Punchihewa",
   "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.6",
     "webpack": "^4.32.1",
     "webpack-cli": "^3.3.2"
   },
