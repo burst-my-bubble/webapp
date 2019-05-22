@@ -1,0 +1,17 @@
+{
+  "name": "webapp",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.doc.ic.ac.uk:BurstMyBubble/webapp.git"
+  },
+  "author": "Joe Rackham, Jack Morrison, Hugo Mayo, Hashan Punchihewa",
+  "devDependencies": {
+    "webpack": "^4.32.1",
+    "webpack-cli": "^3.3.2"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  }
+}
