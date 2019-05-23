@@ -7,11 +7,26 @@ const Login = () => {
   );
 };
 
-const Home = () => {
-  return (
-    <p>You're logged in</p>
-  );
-};
+class Home extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      id: ""
+    };
+    FB.api("/me", (res) => {
+      this.setState({
+        id: res.id
+      });
+    });
+  }
+
+  render() {
+    if (!this.state.id) {
+      return null;
+    }
+    return <img src={"https://graph.facebook.com/" + this.state.id + "/picture?type=square"}/>;
+  }
+}
 
 window.ready = () => {
   FB.getLoginStatus(function(response) {
