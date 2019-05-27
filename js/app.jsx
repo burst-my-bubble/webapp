@@ -1,44 +1,52 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import axios from "axios";
 
-const Login = () => {
-  return (
-    <div className="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="true" data-onlogin="login()"></div>
-  );
+class Login extends React.Component {
+  render() {
+    return (
+      <div className="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="true" data-scope="user_friends" data-onlogin="login()"></div>
+    );
+  }
+
+  componentDidMount() {
+    FB.XFBML.parse();
+  }
 };
 
 class Home extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      id: ""
-    };
-    FB.api("/me", (res) => {
-      this.setState({
-        id: res.id
-      });
-    });
-  }
-
   render() {
-    if (!this.state.id) {
-      return null;
-    }
-    return <img src={"https://graph.facebook.com/" + this.state.id + "/picture?type=square"}/>;
+    return <div>
+        <img src={"https://graph.facebook.com/" + this.props.id + "/picture?type=square"}/>
+        <button onClick={() => {
+          FB.logout();
+          ReactDOM.render(<Login/>, document.getElementById("container"));
+        }}>Logout</button>
+      </div>
   }
 }
 
 window.ready = () => {
   FB.getLoginStatus(function(response) {
-    if (response.status === "not_authorized") {
+    if (response.status === "not_authorized" || response.status === "unknown") {
       ReactDOM.render(<Login/>, document.getElementById("container"));
-      FB.XFBML.parse();
     } else {
-      ReactDOM.render(<Home/>, document.getElementById("container"));
+      ReactDOM.render(<Home id={response.authResponse.userID}/>, document.getElementById("container"));
     }
   });
 };
 
 window.login = () => {
-  ReactDOM.render(<Home/>, document.getElementById("container"));
+  FB.api("/me", ({id, name}) => {
+    axios.post('http://localhost:5000/api/register_user', {
+      name: name,
+      id: id
+    })
+    .then((response) => {
+      ReactDOM.render(<Home id={id}/>, document.getElementById("container"));
+      FB.api("/" + id + "/friends", (res) => {
+        console.log(res);
+      });
+    });  
+  });
 };
