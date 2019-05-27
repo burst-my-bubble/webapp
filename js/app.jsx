@@ -15,13 +15,25 @@ class Login extends React.Component {
 };
 
 class Home extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      loaded: false
+    };
+    axios.get("http://localhost:5000/api/articles").then(({data}) => {
+      this.setState({
+        loaded: true,
+        data: data
+      });
+    });
+  }
   render() {
-    const articles = [...Array(12).keys()].map((a, i) => { 
+    const articles = !this.state.loaded ? [] : this.state.data.map((article) => { 
       return <div className="col-md-3">
         <div className="card article">
           <img src="https://dummyimage.com/600x400/d9d9d9/000000" className="card-img-top"/>
           <div className="card-body">
-            <p className="card-text">European elections 2019: Brexit Party dominates as Tories and Labour suffer</p>
+            <p className="card-text">{article.title}</p>
             <a href="#" className="card-link">Comments</a>
           </div>
         </div>
