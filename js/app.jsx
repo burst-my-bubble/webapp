@@ -11,9 +11,54 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
+    window.login = () => {
+      FB.api("/me", ({id, name}) => {
+        axios.post('http://localhost:5000/api/register_user', {
+          name: name,
+          id: id
+        })
+        .then((response) => {
+          this.props.login(id);
+          /*FB.api("/" + id + "/friends", (res) => {
+            console.log(res);
+          });*/
+        });  
+      });
+    };
     FB.XFBML.parse();
   }
 };
+
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      loaded: false
+    };
+    FB.getLoginStatus((response) => {
+      if (response.status === "not_authorized" || response.status === "unknown") {
+        this.setState({loaded: true, id: ""});
+      } else {
+        this.setState({loaded: true, id: response.authResponse.userID});
+      }
+    });
+  }
+
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    if (!this.state.id) {
+      return <Login login={(id) => this.setState({id: id})}/>;
+    } else {
+      return <Main id={this.state.id} logout={() => {
+        FB.logout();
+        this.setState({id: ""});
+      }}/>
+    }
+  }
+}
 
 const Profile = () => 
   <p>Profile Page</p>;
@@ -36,10 +81,7 @@ const Main = (props) =>
               <Link to="/categories" className="nav-link">Categories</Link>
             </li>
             <li className="nav-item">
-              <button onClick={() => {
-          FB.logout();
-          ReactDOM.render(<Login/>, document.getElementById("container"));
-        }} className="btn btn-link nav-link" href="#">Logout</button>
+              <button onClick={props.logout} className="btn btn-link nav-link" href="#">Logout</button>
             </li>
           </ul>
           <ul className="navbar-nav">
@@ -76,9 +118,13 @@ class Home extends React.Component {
       const id = article._id["$oid"];
       return <div className="col-md-3" key={id}>
         <div className="card article">
-          <img src="https://dummyimage.com/600x400/d9d9d9/000000" className="card-img-top"/>
+          <a target="_blank" href={article.url}>
+            <img src="https://dummyimage.com/600x400/d9d9d9/000000" className="card-img-top"/>
+          </a>
           <div className="card-body">
-            <p className="card-text">{article.title}</p>
+            <p className="card-text">
+              <a className="no-link" target="_blank" href={article.url}>{article.title}</a>
+            </p>
             <Link to={"/article/" + id + "/comments"} className="card-link">Comments</Link>
           </div>
         </div>
@@ -95,26 +141,7 @@ class Home extends React.Component {
 }
 
 window.ready = () => {
-  FB.getLoginStatus(function(response) {
-    if (response.status === "not_authorized" || response.status === "unknown") {
-      ReactDOM.render(<Login/>, document.getElementById("container"));
-    } else {
-      ReactDOM.render(<Main id={response.authResponse.userID}/>, document.getElementById("container"));
-    }
-  });
+  ReactDOM.render(<App/>, document.getElementById("container"));
 };
 
-window.login = () => {
-  FB.api("/me", ({id, name}) => {
-    axios.post('http://localhost:5000/api/register_user', {
-      name: name,
-      id: id
-    })
-    .then((response) => {
-      ReactDOM.render(<Main id={id}/>, document.getElementById("container"));
-      FB.api("/" + id + "/friends", (res) => {
-        console.log(res);
-      });
-    });  
-  });
-};
+
