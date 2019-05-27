@@ -16,12 +16,47 @@ class Login extends React.Component {
 
 class Home extends React.Component {
   render() {
+    const articles = [...Array(12).keys()].map((a, i) => { 
+      return <div className="col-md-3">
+        <div className="card article">
+          <img src="https://dummyimage.com/600x400/d9d9d9/000000" className="card-img-top"/>
+          <div className="card-body">
+            <p className="card-text">European elections 2019: Brexit Party dominates as Tories and Labour suffer</p>
+            <a href="#" className="card-link">Comments</a>
+          </div>
+        </div>
+      </div>;
+    });
     return <div>
-        <img src={"https://graph.facebook.com/" + this.props.id + "/picture?type=square"}/>
-        <button onClick={() => {
+        <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
+          <a className="navbar-brand" href="#">Burst My Bubble</a>
+          <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li className="nav-item">
+              <a href="/" className="nav-link">Home</a>
+            </li>
+            <li className="nav-item">
+              <a href="/categories" className="nav-link">Categories</a>
+            </li>
+            <li className="nav-item">
+              <button onClick={() => {
           FB.logout();
           ReactDOM.render(<Login/>, document.getElementById("container"));
-        }}>Logout</button>
+        }} className="btn btn-link nav-link" href="#">Logout</button>
+            </li>
+          </ul>
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <a href="/profile">
+                <img className="profile" src={"https://graph.facebook.com/" + this.props.id + "/picture?type=normal"}/>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div className="container">
+          <div className="row">
+            {articles}
+          </div>
+        </div>
       </div>
   }
 }
