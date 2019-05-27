@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import axios from "axios";
 
 class Login extends React.Component {
@@ -16,7 +16,13 @@ class Login extends React.Component {
 };
 
 const Profile = () => 
-  <p>Hi</p>;
+  <p>Profile Page</p>;
+
+const Comments = () => 
+  <p>Comments Page</p>;
+
+const NoMatch = () =>
+  <p>Page Not Found</p>;
 
 const Main = (props) => 
 <Router>
@@ -27,7 +33,7 @@ const Main = (props) =>
               <Link to="/" className="nav-link">Home</Link>
             </li>
             <li className="nav-item">
-              <a href="/categories" className="nav-link">Categories</a>
+              <Link to="/categories" className="nav-link">Categories</Link>
             </li>
             <li className="nav-item">
               <button onClick={() => {
@@ -44,8 +50,12 @@ const Main = (props) =>
             </li>
           </ul>
         </nav>
-      <Route path="/" exact component={() => <Home id={props.id}/>}/>
-      <Route path="/profile" exact component={() => <Profile id={props.id}/>}/>
+      <Switch>
+        <Route path="/" exact component={() => <Home id={props.id}/>}/>
+        <Route path="/profile" exact component={() => <Profile id={props.id}/>}/>
+        <Route path="/article/:id/comments" exact component={() => <Comments id={props.id}/>}/>
+        <Route component={NoMatch}></Route>
+      </Switch>
     </Router>;
 
 class Home extends React.Component {
@@ -63,12 +73,13 @@ class Home extends React.Component {
   }
   render() {
     const articles = !this.state.loaded ? [] : this.state.data.map((article) => { 
-      return <div className="col-md-3" key={article._id["$oid"]}>
+      const id = article._id["$oid"];
+      return <div className="col-md-3" key={id}>
         <div className="card article">
           <img src="https://dummyimage.com/600x400/d9d9d9/000000" className="card-img-top"/>
           <div className="card-body">
             <p className="card-text">{article.title}</p>
-            <a href="#" className="card-link">Comments</a>
+            <Link to={"/article/" + id + "/comments"} className="card-link">Comments</Link>
           </div>
         </div>
       </div>;
