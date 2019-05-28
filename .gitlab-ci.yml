@@ -10,3 +10,8 @@ build:
   stage: build
   script:
     - docker build -t webapp .
+
+test:
+  stage: test
+  script:
+    - docker run webapp npm test

@@ -10,13 +10,15 @@
   "private": "true",
   "scripts": {
     "build": "webpack --watch --mode development",
-    "start": "webpack-dev-server --port 8000 --contentBase static --history-api-fallback"
+    "start": "webpack-dev-server --port 8000 --contentBase static --history-api-fallback",
+    "test": "jest"
   },
   "author": "Joe Rackham, Jack Morrison, Hugo Mayo, Hashan Punchihewa",
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
+    "jest": "^24.8.0",
     "webpack": "^4.32.1",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.4.1"
@@ -26,5 +28,8 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0"
+  },
+  "jest": {
+    "testMatch": [ "**/test/*.js" ]
   }
 }
