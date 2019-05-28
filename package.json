@@ -10,7 +10,7 @@
   "private": "true",
   "scripts": {
     "build": "webpack --watch --mode development",
-    "start": "webpack-dev-server --port 8000 --contentBase static --history-api-fallback",
+    "start": "webpack-dev-server",
     "test": "jest"
   },
   "author": "Joe Rackham, Jack Morrison, Hugo Mayo, Hashan Punchihewa",
@@ -30,6 +30,8 @@
     "react-router-dom": "^5.0.0"
   },
   "jest": {
-    "testMatch": [ "**/test/*.js" ]
+    "testMatch": [
+      "**/test/*.js"
+    ]
   }
 }

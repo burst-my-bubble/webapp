@@ -16,5 +16,10 @@ module.exports = {
         }
       }
     ]
+  },
+  devServer: {
+    publicPath: "/js",
+    contentBase: "static",
+    port: 8000
   }
 }

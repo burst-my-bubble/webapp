@@ -15,3 +15,11 @@ test:
   stage: test
   script:
     - docker run webapp npm test
+
+deploy:
+  stage: deploy
+  script:
+    - docker stop deployed-container || true
+    - docker rm deployed-container || true
+    - docker run --rm -d -p 8000:8000 --name deployed-container webapp
+    - docker image prune
