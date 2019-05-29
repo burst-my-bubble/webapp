@@ -9,16 +9,17 @@ before_script:
 build:
   stage: build
   script:
-    - docker build -t webapp .
+    - docker build --target build-stage -t webapp-dev .
 
 test:
   stage: test
   script:
-    - docker run webapp npm test
+    - docker run webapp-dev npm test
 
 deploy:
   stage: deploy
   script:
+    - docker build -t webapp .
     - docker stop deployed-container || true
     - docker rm deployed-container || true
     - docker run --rm -d -p 8000:8000 --name deployed-container webapp
