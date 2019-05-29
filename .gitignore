@@ -1,2 +1,5 @@
 node_modules
 static/js
+*.log
+__pycache__
+.DS_Store
