@@ -14,13 +14,12 @@ build:
 test:
   stage: test
   script:
-    - docker run webapp-dev npm test
+    - docker run --name temp webapp-dev npm test
 
 deploy:
   stage: deploy
   script:
-    - docker build -t webapp .
-    - docker stop deployed-container || true
-    - docker rm deployed-container || true
-    - docker run --rm -d -p 8000:8000 --name deployed-container webapp
+    - rm -rf /var/ww/html/
+    - docker cp temp:static /var/www/html/
+    - docker rm temp
     - docker image prune
