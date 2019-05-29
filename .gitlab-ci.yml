@@ -28,3 +28,10 @@ build_server:
   stage: build
   script:
     - docker build -t server server
+
+deploy_server:
+  stage: deploy
+  script:
+    - docker stop deployed-server || true
+    - docker rm deployed-server || true
+    - docker run --name deployed-server --rm -d -v /home/gitlab-runner/fcgi.sock:/fcgi.sock server 
