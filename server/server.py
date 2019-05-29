@@ -24,3 +24,6 @@ def register_user():
 @app.route("/api/articles", methods=['GET'])
 def articles():
     return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)])))
+
+if __name__ == "__main__":
+   app.run(port=8000)

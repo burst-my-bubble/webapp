@@ -34,4 +34,4 @@ deploy_server:
   script:
     - docker stop deployed-server || true
     - docker rm deployed-server || true
-    - docker run --name deployed-server --rm -d -v /home/gitlab-runner/fcgi.sock:/fcgi.sock server 
+    - docker run -p 8000:8000 --name deployed-server --rm -d server
