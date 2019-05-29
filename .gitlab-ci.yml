@@ -9,7 +9,7 @@ before_script:
 build:
   stage: build
   script:
-    - docker build --target build-stage -t webapp-dev .
+    - docker build -t webapp-dev client
 
 test:
   stage: test
@@ -23,3 +23,8 @@ deploy:
     - docker cp temp:static /var/www/html/
     - docker rm temp
     - docker image prune
+
+build_server:
+  stage: build
+  script:
+    - docker build -t server server
