@@ -34,4 +34,4 @@ deploy_server:
   script:
     - docker stop deployed-server || true
     - docker rm deployed-server || true
-    - docker run -p 8000:8000 --name deployed-server --rm -d server
+    - docker run -p 8000:8000 --name deployed-server --network mynetwork --rm -d server
