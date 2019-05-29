@@ -19,7 +19,7 @@ test:
 deploy:
   stage: deploy
   script:
-    - rm -rf /var/ww/html/
+    - rm -rf /var/www/html/
     - docker cp temp:static /var/www/html/
     - docker rm temp
     - docker image prune
