@@ -1,5 +1,5 @@
 node_modules
-static/js
+client/static/js
 *.log
 __pycache__
 .DS_Store

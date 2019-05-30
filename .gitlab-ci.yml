@@ -9,17 +9,29 @@ before_script:
 build:
   stage: build
   script:
-    - docker build -t webapp .
+    - docker build -t webapp-dev client
 
 test:
   stage: test
   script:
-    - docker run webapp npm test
+    - docker run --name temp webapp-dev npm test
 
 deploy:
   stage: deploy
   script:
-    - docker stop deployed-container || true
-    - docker rm deployed-container || true
-    - docker run --rm -d -p 8000:8000 --name deployed-container webapp
+    - rm -rf /var/www/html/
+    - docker cp temp:static /var/www/html/
+    - docker rm temp
     - docker image prune
+
+build_server:
+  stage: build
+  script:
+    - docker build -t server server
+
+deploy_server:
+  stage: deploy
+  script:
+    - docker stop deployed-server || true
+    - docker rm deployed-server || true
+    - docker run -p 8000:8000 --name deployed-server --network mynetwork --rm -d server

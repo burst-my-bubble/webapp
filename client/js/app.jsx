@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import axios from "axios";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 
 class Login extends React.Component {
   render() {
@@ -13,7 +13,7 @@ class Login extends React.Component {
   componentDidMount() {
     window.login = () => {
       FB.api("/me", ({id, name}) => {
-        axios.post('http://localhost:5000/api/register_user', {
+        axios.post('/api/register_user', {
           name: name,
           id: id
         })
@@ -72,8 +72,10 @@ const NoMatch = () =>
 const Main = (props) => 
 <Router>
     <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
-          <a className="navbar-brand" href="#">Burst My Bubble</a>
           <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li className="nav-item">
+              <Link className="navbar-brand" to="/">Burst Your Bubble</Link>
+            </li>
             <li className="nav-item">
               <Link to="/" className="nav-link">Home</Link>
             </li>
@@ -106,7 +108,7 @@ class Home extends React.Component {
     this.state = {
       loaded: false
     };
-    axios.get("http://localhost:5000/api/articles").then(({data}) => {
+    axios.get("/api/articles").then(({data}) => {
       this.setState({
         loaded: true,
         data: data
