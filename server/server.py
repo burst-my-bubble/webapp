@@ -5,16 +5,15 @@ from bson import json_util
 import json
 import os
 
-<<<<<<< HEAD
-client = MongoClient("localhost", 27017)
-=======
 database_uri = "localhost"
+port = 5000
 
 if "DATABASE_URI" in os.environ:
     database_uri = os.environ["DATABASE_URI"]
+if "PORT" in os.environ:
+    port = os.environ["PORT"]
 
 client = MongoClient(database_uri, 27017)
->>>>>>> 6f8b7a3821ed654d7090d16105843d4a1e2252fd
 db = client["burstMyBubble"]
 app = Flask(__name__)
 CORS(app)
@@ -36,4 +35,4 @@ def articles():
     return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)])))
 
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=5000)
+   app.run(host="0.0.0.0", port=port)

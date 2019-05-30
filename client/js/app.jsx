@@ -13,7 +13,7 @@ class Login extends React.Component {
   componentDidMount() {
     window.login = () => {
       FB.api("/me", ({id, name}) => {
-        axios.post('http://localhost:5000/api/register_user', {
+        axios.post(SERVER_URI + 'api/register_user', {
           name: name,
           id: id
         })
@@ -108,7 +108,7 @@ class Home extends React.Component {
     this.state = {
       loaded: false
     };
-    axios.get("http://localhost:5000/api/articles").then(({data}) => {
+    axios.get(SERVER_URI + "api/articles").then(({data}) => {
       this.setState({
         loaded: true,
         data: data
