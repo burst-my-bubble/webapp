@@ -3,8 +3,14 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from bson import json_util
 import json
+import os
 
-client = MongoClient("database", 27017)
+database_uri = "localhost"
+
+if "DATABASE_URI" in os.environ:
+    database_uri = os.environ["DATABASE_URI"]
+
+client = MongoClient(database_uri, 27017)
 db = client["burstMyBubble"]
 app = Flask(__name__)
 CORS(app)
