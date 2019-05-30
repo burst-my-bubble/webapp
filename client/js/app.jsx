@@ -18,7 +18,8 @@ class Login extends React.Component {
           id: id
         })
         .then((response) => {
-          this.props.login(id);
+          console.log(response)
+          this.props.login(id, response.data._id);
           /*FB.api("/" + id + "/friends", (res) => {
             console.log(res);
           });*/
@@ -39,7 +40,16 @@ class App extends React.Component {
       if (response.status === "not_authorized" || response.status === "unknown") {
         this.setState({loaded: true, id: ""});
       } else {
-        this.setState({loaded: true, id: response.authResponse.userID});
+        axios.post(SERVER_URI + 'api/get_user_id', {
+          id: response.authResponse.userID
+        })
+        .then((r) => {
+          console.log(r)
+          /*FB.api("/" + id + "/friends", (res) => {
+            console.log(res);
+          });*/
+          this.setState({loaded: true, id: response.authResponse.userID, _id: r.data._id});
+        }); 
       }
     });
   }
@@ -50,9 +60,9 @@ class App extends React.Component {
     }
 
     if (!this.state.id) {
-      return <Login login={(id) => this.setState({id: id})}/>;
+      return <Login login={(id, _id) => this.setState({id: id, _id: _id})}/>;
     } else {
-      return <Main id={this.state.id} logout={() => {
+      return <Main id={this.state.id} _id={this.state._id} logout={() => {
         FB.logout();
         this.setState({id: ""});
       }}/>
@@ -60,8 +70,29 @@ class App extends React.Component {
   }
 }
 
-const Profile = () => 
-  <p>Profile Page</p>;
+class Profile extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      loaded: false
+    };
+    axios.post(SERVER_URI + "api/all_articles", {user_id: props._id}).then(({data}) => {
+      console.log("helloao");
+      this.setState({
+        loaded: true,
+        data: data
+      });
+    });
+  }
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+    const articles = this.state.data.map(article => 
+      <li><a href={article.url}>{article.title}</a></li>);
+    return <ul>{articles}</ul>;
+  }
+}
 
 const Comments = () => 
   <p>Comments Page</p>;
@@ -95,8 +126,8 @@ const Main = (props) =>
           </ul>
         </nav>
       <Switch>
-        <Route path="/" exact component={() => <Home id={props.id}/>}/>
-        <Route path="/profile" exact component={() => <Profile id={props.id}/>}/>
+        <Route path="/" exact component={() => <Home id={props.id} _id={props._id}/>}/>
+        <Route path="/profile" exact component={() => <Profile _id={props._id} id={props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={props.id}/>}/>
         <Route component={NoMatch}></Route>
       </Switch>
@@ -120,12 +151,12 @@ class Home extends React.Component {
       const id = article._id["$oid"];
       return <div className="col-md-3" key={id}>
         <div className="card article">
-          <a target="_blank" href={article.url}>
+          <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
             <img src={article.image_url} className="card-img-top"/>
           </a>
           <div className="card-body">
             <p className="card-text">
-              <a className="no-link" target="_blank" href={article.url}>{article.title}</a>
+              <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
             </p>
             <Link to={"/article/" + id + "/comments"} className="card-link">Comments</Link>
           </div>
@@ -139,6 +170,12 @@ class Home extends React.Component {
           </div>
         </div>
       </div>
+  }
+
+  markAsRead(id) {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
+      console.log("sent");
+    });
   }
 }
 
