@@ -13,7 +13,7 @@ class Login extends React.Component {
   componentDidMount() {
     window.login = () => {
       FB.api("/me", ({id, name}) => {
-        axios.post('/api/register_user', {
+        axios.post('http://localhost:5000/api/register_user', {
           name: name,
           id: id
         })
@@ -108,7 +108,7 @@ class Home extends React.Component {
     this.state = {
       loaded: false
     };
-    axios.get("/api/articles").then(({data}) => {
+    axios.get("http://localhost:5000/api/articles").then(({data}) => {
       this.setState({
         loaded: true,
         data: data
@@ -121,7 +121,7 @@ class Home extends React.Component {
       return <div className="col-md-3" key={id}>
         <div className="card article">
           <a target="_blank" href={article.url}>
-            <img src="https://dummyimage.com/600x400/d9d9d9/000000" className="card-img-top"/>
+            <img src={article.image_url} className="card-img-top"/>
           </a>
           <div className="card-body">
             <p className="card-text">

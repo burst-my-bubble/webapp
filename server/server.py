@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from bson import json_util
 import json
 
-client = MongoClient("database", 27017)
+client = MongoClient("localhost", 27017)
 db = client["burstMyBubble"]
 app = Flask(__name__)
 CORS(app)
@@ -26,4 +26,4 @@ def articles():
     return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)])))
 
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=8000)
+   app.run(host="0.0.0.0", port=5000)
