@@ -59,5 +59,7 @@ def all_articles():
     all_read = db.users.find_one({"_id": user_id})["read"]
     return jsonify(list(db.articles.find({"_id":{"$in": all_read}})))
 
+
+
 if __name__ == "__main__":
    app.run(host="0.0.0.0", port=port)
