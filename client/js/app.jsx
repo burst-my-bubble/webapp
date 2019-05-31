@@ -188,6 +188,8 @@ class Home extends React.Component {
               <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
             </p>
             <Link to={"/article/" + id + "/comments"} className="card-link">Comments</Link>
+            
+            <p style={"color:" + getColour(article.sentiment)}>◉</p>
           </div>
         </div>
       </div>;
@@ -205,6 +207,19 @@ class Home extends React.Component {
     axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
       console.log("sent");
     });
+  }
+
+  getColour(sentiment){
+    if(sentiment < 0.2){
+      return "rgb(255, 0, 0)";
+    } else if (sentiment < 0.4) {
+      return "rgb(246, 84, 0)";
+    } else if (sentiment < 0.6) {
+      return "rgb(243, 154, 0)";
+    } else if (sentiment < 0.8) {
+      return "rgb(194, 243, 0)";
+    }
+    return "rgb(1, 255, 0)";
   }
 }
 
