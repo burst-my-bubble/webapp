@@ -3,3 +3,4 @@ client/static/js
 *.log
 __pycache__
 .DS_Store
+app.bundle.js
