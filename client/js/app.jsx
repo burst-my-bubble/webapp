@@ -88,8 +88,9 @@ class Profile extends React.Component {
     if (!this.state.loaded) {
       return null;
     }
-    const articles = this.state.data.map(article => 
-      <li><a href={article.url}>{article.title}</a></li>);
+    console.log(this.state.data);
+    const articles = this.state.data.sort((a, b) => b.access_time["$date"] - a.access_time["$date"]).map(article => 
+      <li key={article._id}><a href={article.url}>{article.title}</a> ({new Date(article.access_time["$date"]).toString()})</li>);
     return <ul>{articles}</ul>;
   }
 }
