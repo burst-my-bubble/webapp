@@ -42,6 +42,20 @@ def get_user_id():
 def articles():
     return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)])))
 
+@app.route("/api/categories", methods=['GET'])
+def categories():
+    return jsonify(list(db.categories.find()))
+
+@app.route("/api/articles/<category>", methods=['GET'])
+def articlesByCategory(category):
+    c = db.categories.find_one({"slug": category})
+    if c is None:
+        return jsonify([])
+    else:
+        feeds = db.feeds.find({"category_id": c["_id"]}, projection= {"_id": 1})
+        feeds = list(map(lambda x: x["_id"], feeds))
+        return jsonify(list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)])))
+
 @app.route("/api/read", methods=['POST'])
 def read():
     content = request.json
