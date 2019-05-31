@@ -127,20 +127,48 @@ const Main = (props) =>
           </ul>
         </nav>
       <Switch>
-        <Route path="/" exact component={() => <Home id={props.id} _id={props._id}/>}/>
+        <Route path="/" exact component={() => <Home url="" id={props.id} _id={props._id}/>}/>
         <Route path="/profile" exact component={() => <Profile _id={props._id} id={props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={props.id}/>}/>
+        <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={props.id} _id={props._id}/>}/>
+        <Route path="/categories" exact component={() => <Category id={props.id} _id={props._id}/>}/>
         <Route component={NoMatch}></Route>
       </Switch>
     </Router>;
 
-class Home extends React.Component {
+class Category extends React.Component {
   constructor() {
     super();
     this.state = {
       loaded: false
     };
-    axios.get(SERVER_URI + "api/articles").then(({data}) => {
+    axios.get(SERVER_URI + "api/categories").then(({data}) => {
+      this.setState({
+        loaded: true,
+        data: data
+      })
+    });
+  }
+
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    const categories = this.state.data.map((category) => 
+      <li key={category._id}><Link to={"/categories/" + category.slug}>{category.title}</Link></li>);
+    return <ul>{categories}</ul>;
+  }
+}
+
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loaded: false
+    };
+    console.log(props.url);
+    axios.get(SERVER_URI + "api/articles" + props.url).then(({data}) => {
       this.setState({
         loaded: true,
         data: data
