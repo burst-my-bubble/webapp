@@ -106,7 +106,7 @@ const Main = (props) =>
     <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
           <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
             <li className="nav-item">
-              <Link className="navbar-brand" to="/">Burst Our Bubble</Link>
+              <Link className="navbar-brand" to="/">Burst My Bubble</Link>
             </li>
             <li className="nav-item">
               <Link to="/" className="nav-link">Home</Link>
