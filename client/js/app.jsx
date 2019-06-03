@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import CalendarHeatmap from 'react-calendar-heatmap';
 
 class Login extends React.Component {
   render() {
@@ -94,13 +95,51 @@ class Profile extends React.Component {
     ).map(a => Object.assign({}, a, {access_time: new Date(a.access_time["$date"])}));
     
     var TODAY = new Date(Date.now());
+    var TODAY_365 = new Date(TODAY);
+    TODAY_365.setDate(TODAY.getDate() - 365);
 
     var lastWeek = articles.filter(a => this.daysBetween(a.access_time, TODAY) <= 7);
     var today = lastWeek.filter(a => this.sameDay(a.access_time, TODAY));
     var notTodayButLastWeek = lastWeek.filter(a => !this.sameDay(a.access_time, TODAY));
     var lastMonth = articles.filter(a => this.daysBetween(a.access_time, TODAY) > 7);
 
+    var map = {};
+    articles.forEach(a => {
+      var t = a.access_time;
+      var y = (t.getMonth() + 1).toString();
+      var y2 = t.getDate().toString();
+      if (y.length < 2) {
+        y = "0" + y;
+      }
+      if (y2.length < 2) {
+        y2 = "0" + y2;
+      }
+      var m = t.getFullYear() + "-" + y + "-" + y2;
+      if (!map[m]) {
+        map[m] = 0;
+      }
+      map[m]++;
+    });
+
+    var tMap = Object.entries(map).map(a => {
+      return { date: a[0], count: a[1] };
+    });
+
+    console.log(tMap);
+
     return <div className="container">
+      <CalendarHeatmap
+  startDate={TODAY_365}
+  endDate={TODAY}
+  values={tMap}
+  classForValue={(value) => {
+    console.log(value);
+    if (!value) {
+      return 'color-empty';
+    }
+    return `color-scale-${value.count}`;
+  }}
+/>
         <h4>Today</h4>
         {this.toHtml(today)}
         <h4>Last Week</h4>
