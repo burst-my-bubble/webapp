@@ -142,6 +142,15 @@ class Profile extends React.Component {
   }}
 />
    </div>
+   <div className="col-md-3">
+     <div className="card"><h1>57</h1> articles read this week. Technology being your favourite category.</div>
+   </div>
+   <div className="col-md-3">
+     <div className="card"><h1>10</h1> different news sources read this week. TheGuardian being your favourite news source.</div>
+   </div>
+   <div className="col-md-3">
+
+   </div>
  </div>
       
 <br/>
