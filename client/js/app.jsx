@@ -310,6 +310,9 @@ class Home extends React.Component {
   render() {
     const articles = !this.state.loaded ? [] : this.state.data.map((article) => { 
       const id = article._id["$oid"];
+      const tags = article.entities.map(e => {
+        return <span key={e.displayName} className="badge badge-secondary">{e.displayName}</span>;
+      });
       return <div className="col-md-3" key={id}>
         <div className="card article">
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>

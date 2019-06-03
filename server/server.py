@@ -55,6 +55,15 @@ def articles():
             skip = int(skip)
         except:
             skip = 0
+    displayedArticles = list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip))
+    #allEntities = list(db.entities.find({"score": {"$gt": 3 }}))
+    
+    for article in displayedArticles:
+        entities = list(map(lambda x: x["displayName"], article["entities"]))
+        entities = db.entities.find({"displayName": {"$in" : entities}, "score": {"$gt": 3}}, sort=[("score", -1)], limit=5)
+        entities = list(entities)
+        article["entities"] = entities
+
     return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip)))
 
 @app.route("/api/categories", methods=['GET'])
