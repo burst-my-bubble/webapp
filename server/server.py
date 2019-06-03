@@ -5,6 +5,8 @@ from bson import json_util, ObjectId
 from datetime import datetime
 import json
 import os
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 database_uri = "localhost"
 port = 5000
@@ -13,6 +15,11 @@ if "DATABASE_URI" in os.environ:
     database_uri = os.environ["DATABASE_URI"]
 if "PORT" in os.environ:
     port = os.environ["PORT"]
+if "SENTRY_URI" in os.environ:
+    sentry_sdk.init(
+        dsn=os.environ["SENTRY_URI"],
+        integrations=[FlaskIntegration()]
+    )
 
 client = MongoClient(database_uri, 27017)
 db = client["burstMyBubble"]
@@ -81,9 +88,6 @@ def all_articles():
     for x in articles:
         x["access_time"] = t[x["_id"]]
     return jsonify(articles)
-
-
-
-
+    
 if __name__ == "__main__":
    app.run(host="0.0.0.0", port=port)
