@@ -21,9 +21,7 @@ class Login extends React.Component {
         .then((response) => {
           console.log(response)
           this.props.login(id, response.data._id);
-          /*FB.api("/" + id + "/friends", (res) => {
-            console.log(res);
-          });*/
+        
         });  
       });
     };
@@ -96,7 +94,7 @@ class Profile extends React.Component {
     
     var TODAY = new Date(Date.now());
     var TODAY_365 = new Date(TODAY);
-    TODAY_365.setDate(TODAY.getDate() - 365);
+    TODAY_365.setDate(TODAY.getDate() - 100);
 
     var lastWeek = articles.filter(a => this.daysBetween(a.access_time, TODAY) <= 7);
     var today = lastWeek.filter(a => this.sameDay(a.access_time, TODAY));
@@ -128,7 +126,10 @@ class Profile extends React.Component {
     console.log(tMap);
 
     return <div className="container">
-      <CalendarHeatmap
+<br/>
+ <div className="row">
+   <div className="col-md-3">
+   <CalendarHeatmap
   startDate={TODAY_365}
   endDate={TODAY}
   values={tMap}
@@ -140,6 +141,10 @@ class Profile extends React.Component {
     return `color-scale-${value.count}`;
   }}
 />
+   </div>
+ </div>
+      
+<br/>
         <h4>Today</h4>
         {this.toHtml(today)}
         <h4>Last Week</h4>
@@ -188,6 +193,9 @@ const Main = (props) =>
               <Link to="/" className="nav-link">Home</Link>
             </li>
             <li className="nav-item">
+              <Link to="/friends" className="nav-link">Friends</Link>
+            </li>
+            <li className="nav-item">
               <Link to="/categories" className="nav-link">Categories</Link>
             </li>
             <li className="nav-item">
@@ -205,12 +213,47 @@ const Main = (props) =>
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={props.id} _id={props._id}/>}/>
         <Route path="/profile" exact component={() => <Profile _id={props._id} id={props.id}/>}/>
+        <Route path="/friends" exact component={() => <Friends _id={props._id} id={props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={props.id} _id={props._id}/>}/>
         <Route path="/categories" exact component={() => <Category id={props.id} _id={props._id}/>}/>
         <Route component={NoMatch}></Route>
       </Switch>
     </Router>;
+
+class Friends extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loaded: false
+    }
+    FB.api("/" + props.id + "/friends", ({data}) => {
+      this.setState({
+        data: data,
+        loaded: true
+      });
+    });
+  }
+
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    const people = this.state.data.map(({id, name}) => {
+      return <div className="card col-md-3" key={id}>
+        <img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/>
+        <h4>{name}</h4>
+      </div>
+    });
+
+    return <div className="container">
+      <div className="row">
+        {people}
+      </div>
+    </div>;
+  }
+}
 
 class Category extends React.Component {
   constructor() {
