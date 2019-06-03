@@ -64,7 +64,7 @@ def articles():
         entities = list(entities)
         article["entities"] = entities
 
-    return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip)))
+    return jsonify(displayedArticles)
 
 @app.route("/api/categories", methods=['GET'])
 def categories():
