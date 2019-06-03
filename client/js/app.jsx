@@ -275,7 +275,7 @@ class Category extends React.Component {
     }
 
     const categories = this.state.data.map((category) => 
-      <li key={category._id}><Link to={"/categories/" + category.slug}>{category.title}</Link></li>);
+      <li key={category._id["$oid"]}><Link to={"/categories/" + category.slug}>{category.title}</Link></li>);
     return <ul>{categories}</ul>;
   }
 }
@@ -290,10 +290,24 @@ class Home extends React.Component {
     axios.get(SERVER_URI + "api/articles" + props.url).then(({data}) => {
       this.setState({
         loaded: true,
-        data: data
+        data: data,
+        page: 0
       });
     });
   }
+
+  nextPage() {
+    var nextPage = this.state.page + 1;
+    var skip = nextPage * 12;
+    axios.get(SERVER_URI + "api/articles" + this.props.url + "?skip=" + skip).then(({data}) => {
+      this.setState({
+        loaded: true,
+        data: data,
+        page: nextPage
+      });
+    });
+  }
+
   render() {
     const articles = !this.state.loaded ? [] : this.state.data.map((article) => { 
       const id = article._id["$oid"];
@@ -315,6 +329,7 @@ class Home extends React.Component {
     });
     return <div>
         <div className="container">
+          <button className="btn btn-secondary" onClick={this.nextPage.bind(this)}>Next Page</button>
           <div className="row">
             {articles}
           </div>

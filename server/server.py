@@ -47,7 +47,15 @@ def get_user_id():
 
 @app.route("/api/articles", methods=['GET'])
 def articles():
-    return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)])))
+    skip = request.args.get("skip")
+    if skip == None:
+        skip = 0
+    else:
+        try:
+            skip = int(skip)
+        except:
+            skip = 0
+    return jsonify(list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip)))
 
 @app.route("/api/categories", methods=['GET'])
 def categories():
@@ -55,13 +63,21 @@ def categories():
 
 @app.route("/api/articles/<category>", methods=['GET'])
 def articlesByCategory(category):
+    skip = request.args.get("skip")
+    if skip == None:
+        skip = 0
+    else:
+        try:
+            skip = int(skip)
+        except:
+            skip = 0
     c = db.categories.find_one({"slug": category})
     if c is None:
         return jsonify([])
     else:
         feeds = db.feeds.find({"category_id": c["_id"]}, projection= {"_id": 1})
         feeds = list(map(lambda x: x["_id"], feeds))
-        return jsonify(list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)])))
+        return jsonify(list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)], skip=skip)))
 
 @app.route("/api/read", methods=['POST'])
 def read():
@@ -88,6 +104,6 @@ def all_articles():
     for x in articles:
         x["access_time"] = t[x["_id"]]
     return jsonify(articles)
-    
+
 if __name__ == "__main__":
    app.run(host="0.0.0.0", port=port)
