@@ -89,9 +89,46 @@ class Profile extends React.Component {
       return null;
     }
     console.log(this.state.data);
-    const articles = this.state.data.sort((a, b) => b.access_time["$date"] - a.access_time["$date"]).map(article => 
-      <li key={article._id}><a href={article.url}>{article.title}</a> ({new Date(article.access_time["$date"]).toString()})</li>);
-    return <ul>{articles}</ul>;
+    var articles = this.state.data.sort((a, b) => 
+      b.access_time["$date"] - a.access_time["$date"]
+    ).map(a => Object.assign({}, a, {access_time: new Date(a.access_time["$date"])}));
+    
+    var TODAY = new Date(Date.now());
+
+    var lastWeek = articles.filter(a => this.daysBetween(a.access_time, TODAY) <= 7);
+    var today = lastWeek.filter(a => this.sameDay(a.access_time, TODAY));
+    var notTodayButLastWeek = lastWeek.filter(a => !this.sameDay(a.access_time, TODAY));
+    var lastMonth = articles.filter(a => this.daysBetween(a.access_time, TODAY) > 7);
+
+    return <div className="container">
+        <h4>Today</h4>
+        {this.toHtml(today)}
+        <h4>Last Week</h4>
+        {this.toHtml(notTodayButLastWeek)}
+        <h4>Last Month</h4>
+        {this.toHtml(lastMonth)}
+    </div>;
+  }
+
+  daysBetween(first, second) {
+      return Math.round((second - first)/(1000 * 60* 60* 24));
+  }
+
+  toHtml(articles) {
+    var result = articles.map(article => {
+      return <tr key={article._id["$oid"]}>
+        <td><a href={article.url}>{article.title}</a></td> 
+        <td>{article.access_time.toString()}</td>
+    </tr>});
+    return <table className="table table-sm table-bordered">
+      <tbody>{result}</tbody>
+    </table>;
+  }
+
+  sameDay(first, second) {
+    return first.getFullYear() === second.getFullYear() &&
+      first.getMonth() === second.getMonth() &&
+      first.getDate() === second.getDate();
   }
 }
 
