@@ -182,9 +182,33 @@ const Comments = () =>
 const NoMatch = () =>
   <p>Page Not Found</p>;
 
-const Main = (props) => 
-<Router>
-    <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
+class Main extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loaded: false
+    };
+    axios.get(SERVER_URI + "api/categories").then(({data}) => {
+      this.setState({
+        loaded: true,
+        data: data
+      })
+    });
+  }
+
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    const categories = this.state.data.map((category) => 
+      <li className="nav-item" key={category._id["$oid"]}>
+        <Link className="nav-link" to={"/categories/" + category.slug}>{category.title}</Link>
+      </li>);
+
+    return <Router>
+      <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
           <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
             <li className="nav-item">
               <Link className="navbar-brand" to="/">Burst My Bubble</Link>
@@ -195,31 +219,31 @@ const Main = (props) =>
             <li className="nav-item">
               <Link to="/friends" className="nav-link">Friends</Link>
             </li>
+            {categories}
             <li className="nav-item">
-              <Link to="/categories" className="nav-link">Categories</Link>
-            </li>
-            <li className="nav-item">
-              <button onClick={props.logout} className="btn btn-link nav-link" href="#">Logout</button>
+              <button onClick={this.props.logout} className="btn btn-link nav-link" href="#">Logout</button>
             </li>
           </ul>
           <ul className="navbar-nav">
             <li className="nav-item">
               <Link to="/profile">
-                <img className="profile" src={"https://graph.facebook.com/" + props.id + "/picture?type=normal"}/>
+                <img className="profile" src={"https://graph.facebook.com/" + this.props.id + "/picture?type=normal"}/>
               </Link>
             </li>
           </ul>
         </nav>
       <Switch>
-        <Route path="/" exact component={() => <Home url="" id={props.id} _id={props._id}/>}/>
-        <Route path="/profile" exact component={() => <Profile _id={props._id} id={props.id}/>}/>
-        <Route path="/friends" exact component={() => <Friends _id={props._id} id={props.id}/>}/>
-        <Route path="/article/:id/comments" exact component={() => <Comments id={props.id}/>}/>
-        <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={props.id} _id={props._id}/>}/>
-        <Route path="/categories" exact component={() => <Category id={props.id} _id={props._id}/>}/>
+        <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
+        <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
+        <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
         <Route component={NoMatch}></Route>
       </Switch>
     </Router>;
+  }
+}
+
 
 class Friends extends React.Component {
   constructor(props) {
@@ -252,31 +276,6 @@ class Friends extends React.Component {
         {people}
       </div>
     </div>;
-  }
-}
-
-class Category extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      loaded: false
-    };
-    axios.get(SERVER_URI + "api/categories").then(({data}) => {
-      this.setState({
-        loaded: true,
-        data: data
-      })
-    });
-  }
-
-  render() {
-    if (!this.state.loaded) {
-      return null;
-    }
-
-    const categories = this.state.data.map((category) => 
-      <li key={category._id["$oid"]}><Link to={"/categories/" + category.slug}>{category.title}</Link></li>);
-    return <ul>{categories}</ul>;
   }
 }
 
