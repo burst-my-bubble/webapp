@@ -409,7 +409,7 @@ class Home extends React.Component {
   }
 
   loadData() {
-    axios.get(SERVER_URI + "api/articles" + this.state.url).then(({data}) => {
+    axios.post(SERVER_URI + "api/articles" + this.state.url, {user_id: this.props._id}).then(({data}) => {
       this.setState({
         loaded: true,
         data: data,
@@ -422,7 +422,7 @@ class Home extends React.Component {
   nextPage() {
     var nextPage = this.state.page + 1;
     var skip = nextPage * 12;
-    axios.get(SERVER_URI + "api/articles" + this.props.url + "?skip=" + skip).then(({data}) => {
+    axios.post(SERVER_URI + "api/articles" + this.props.url + "?skip=" + skip, {user_id: this.props._id}).then(({data}) => {
       this.setState({
         loaded: true,
         data: data,

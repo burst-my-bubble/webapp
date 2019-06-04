@@ -101,9 +101,7 @@ def gen_article_score(article, entityStats, categoryStats):
 def sortByScore(val):
     return val["score"]
 
-def get_best_matching_articles(skip):
-    content = request.json
-    user_id = ObjectId(content["user_id"]["$oid"])
+def get_best_matching_articles(user_id, skip):
     recent_read = get_user_article_history(user_id)[-120:]
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
@@ -136,7 +134,7 @@ def get_user_id():
     return jsonify(db.users.find_one({"id": iden}))
 
 
-@app.route("/api/articles", methods=['GET'])
+@app.route("/api/articles", methods=['POST'])
 def articles():
     skip = request.args.get("skip")
     if skip == None:
@@ -146,6 +144,9 @@ def articles():
             skip = int(skip)
         except:
             skip = 0
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+
     displayedArticles = get_best_matching_articles(skip) 
     addMetadata(displayedArticles)
 
