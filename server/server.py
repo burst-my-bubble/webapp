@@ -59,8 +59,8 @@ def articles():
     #allEntities = list(db.entities.find({"score": {"$gt": 3 }}))
     
     for article in displayedArticles:
-        entities = list(map(lambda x: x["actualName"], article["entities"]))
-        entities = db.entities.find({"actualName": {"$in" : entities}, "score": {"$gt": 2}, "bl": False}, sort=[("score", -1)], limit=5)
+        entities = list(map(lambda x: x["name"], article["entities"]))
+        entities = db.entities.find({"name": {"$in" : entities}, "score": {"$gt": 2}, "bl": False}, sort=[("score", -1)], limit=5)
         entities = list(entities)
         article["entities"] = entities
 
