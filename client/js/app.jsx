@@ -370,14 +370,38 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loaded: false
+      loaded: false,
+      url: props.url
     };
     console.log(props.url);
-    axios.get(SERVER_URI + "api/articles" + props.url).then(({data}) => {
+  }
+
+  static getDerivedStateFromProps(nextProps, nextState) {
+    if (nextProps.url !== nextState.url) {
+      return Object.assign({}, nextState, {
+        url: nextProps.url
+      });
+    }
+    return null;
+  }
+
+  componentDidMount() {
+    this.loadData();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!this.state.loaded || this.state.url !== this.state.loadedUrl) {
+      this.loadData();
+    }
+  }
+
+  loadData() {
+    axios.get(SERVER_URI + "api/articles" + this.state.url).then(({data}) => {
       this.setState({
         loaded: true,
         data: data,
-        page: 0
+        page: 0,
+        loadedUrl: this.state.url
       });
     });
   }
