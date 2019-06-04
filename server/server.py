@@ -60,7 +60,7 @@ def articles():
     
     for article in displayedArticles:
         entities = list(map(lambda x: x["displayName"], article["entities"]))
-        entities = db.entities.find({"displayName": {"$in" : entities}, "score": {"$gt": 3}}, sort=[("score", -1)], limit=5)
+        entities = db.entities.find({"displayName": {"$in" : entities}, "score": {"$gt": 2}, "bl": False}, sort=[("score", -1)], limit=5)
         entities = list(entities)
         article["entities"] = entities
 
