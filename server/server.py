@@ -118,5 +118,63 @@ def all_articles():
         x["access_time"] = t[x["_id"]]
     return jsonify(articles)
 
+@app.route("/api/sources", methods=['POST'])
+def sources():
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    print(user_id)
+    all_read = list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
+    return jsonify(list(db.articles.aggregate([{
+        "$match": {
+            "_id": {
+                "$in": all_read
+            }
+        }
+    }, {
+        "$group": {
+            "_id": "$feed_id",
+            "count": {
+                "$sum": 1
+            }
+        }
+    }, {
+        "$lookup": {
+            "from": "feeds",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "source_id"
+        }
+    }, {
+        "$project": {
+            "_id": 1,
+            "count": 1,
+            "source_id": {
+                "$arrayElemAt": ["$source_id.source_id", 0]
+            }
+        }
+    }, {
+        "$group": {
+            "_id": "$source_id",
+            "count": {
+                "$sum": "$count"
+            }
+        }
+    }, {
+        "$lookup": {
+            "from": "sources",
+            "localField": "_id",
+            "foreignField": "_id",
+            "as": "source_id"
+        }
+    }, {
+        "$project": {
+            "_id": 1,
+            "count": 1,
+            "title": {
+                "$arrayElemAt": ["$source_id.title", 0]
+            }
+        }
+    }])))
+
 if __name__ == "__main__":
    app.run(host="0.0.0.0", port=port)
