@@ -46,13 +46,13 @@ def gen_category_stats(history):
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
-        for cat in getArticleCategory(article):
-            name = cat["slug"]
-            if name in chosenList:
-                (count, avgSentiment, avgBias) = chosenList[name]
-                chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
-            else:
-                chosenList[name] = (1, sentiment, bias)
+        cat = getArticleCategory(article)
+        name = cat
+        if name in chosenList:
+            (count, avgSentiment, avgBias) = chosenList[name]
+            chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
+        else:
+            chosenList[name] = (1, sentiment, bias)
     return chosenList
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
