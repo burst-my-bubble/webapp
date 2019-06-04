@@ -3,6 +3,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from bson import json_util, ObjectId
 from datetime import datetime
+import dateutil.parser
 import json
 import os
 import sentry_sdk
@@ -38,7 +39,7 @@ def gen_history_stats(history, choice):
     chosenList = []
     for article in history:
         sentiment = article["sentiment"]
-        bias = article["sourceBias"]
+        bias = 0.5 #article["sourceBias"]
         for field in article[choice]:
             name = field["name"]
             if name in chosenList:
@@ -48,9 +49,36 @@ def gen_history_stats(history, choice):
                 chosenList[name] = (1, sentiment, bias)
     return chosenList
 
-#Given an entity and the entity history stats, scores that entity.
-def gen_entity_score(entity, entityHistoryStat):
-    score = abs
+#Gets the category of an article
+def getArticleCategory(article):
+    category_id = db.feeds.find({"_id": article["feed_id"]})["category_id"]
+    return db.categories.find({"_id": category_id})["slug"]
+
+#Gets number of hours between article's publishing and now
+def getDecayScore(article):
+    article_datetime = dateutil.parser.parse(article["published_date"])
+    now = datetime.now()
+    duration = now - article_datetime
+    return max(30 - 5 * divmod(duration.total_seconds, 3600)[0], 0)
+
+#Given an article and the history stats of that user, scores the article.
+def gen_entity_score(article, entityStats, categoryStats):
+    score = 0
+
+    for entity in article["entities"]:
+        name = entity["name"]
+        if name in entityStats: #not taking into account any count, sentiment, bias yet
+            score = score + 30
+
+    name = getArticleCategory(article)
+    if name in categoryStats: #not taking into account any count, sentiment, bias yet
+        score = score + 50
+    
+    score = score + getDecayScore(article)
+    return score
+
+    
+
 
 @app.route("/api/register_user", methods=['POST'])
 def register_user():
