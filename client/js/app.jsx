@@ -69,6 +69,44 @@ class App extends React.Component {
   }
 }
 
+class ProfileSources extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      loaded: false
+    };
+    axios.post(SERVER_URI + "api/sources", {user_id: props._id}).then(({data}) => {
+      this.setState({
+        loaded: true,
+        data: data
+      });
+    });
+  }
+
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    const entries = this.state.data.sort((a, b) => {
+      return b.count - a.count
+    }).map(({title, count}) => 
+      <tr>
+        <td>{title}</td>
+        <td>{count}</td>
+      </tr>);
+
+    return <div className="container">
+      <br/>
+      <table className="table table-bordered">
+        <tbody>
+          {entries}
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
 class Profile extends React.Component {
   constructor(props) {
     super();
@@ -146,7 +184,7 @@ class Profile extends React.Component {
      <div className="card"><h1>57</h1> articles read this week. Technology being your favourite category.</div>
    </div>
    <div className="col-md-3">
-     <div className="card"><h1>10</h1> different news sources read this week. TheGuardian being your favourite news source.</div>
+     <div className="card"><h1><Link to="/profile/sources">10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
    </div>
    <div className="col-md-3">
 
@@ -244,6 +282,7 @@ class Main extends React.Component {
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/profile/sources" exact component={() => <ProfileSources _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
@@ -340,7 +379,13 @@ class Home extends React.Component {
     });
     return <div>
         <div className="container">
-          <button className="btn btn-secondary" onClick={this.nextPage.bind(this)}>Next Page</button>
+          <div className="row">
+            <div className="col-md-4 "></div>
+            <div className="col-md-4"><h1 className="text-center">Front Page</h1></div>
+            <div className="col-md-4">
+              <button className="btn btn-secondary float-right" onClick={this.nextPage.bind(this)}>Next Page</button>
+            </div>
+          </div>
           <div className="row">
             {articles}
           </div>
