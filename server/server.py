@@ -73,7 +73,7 @@ def gen_entity_stats(history):
 #Gets the category of an article
 def getArticleCategory(article):
     category_id = db.feeds.find_one({"_id": article["feed_id"]})["category_id"]
-    return db.categories.find({"_id": category_id})["slug"]
+    return db.categories.find_one({"_id": category_id})["slug"]
 
 #Gets number of hours between article's publishing and now
 def getDecayScore(article):
