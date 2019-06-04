@@ -42,7 +42,7 @@ def get_user_article_history(user_id):
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_category_stats(history):
-    chosenList = []
+    chosenList = dict()
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
@@ -72,7 +72,7 @@ def gen_entity_stats(history):
 
 #Gets the category of an article
 def getArticleCategory(article):
-    category_id = db.feeds.find({"_id": article["feed_id"]})["category_id"]
+    category_id = db.feeds.find_one({"_id": article["feed_id"]})["category_id"]
     return db.categories.find({"_id": category_id})["slug"]
 
 #Gets number of hours between article's publishing and now
