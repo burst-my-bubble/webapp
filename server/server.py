@@ -139,8 +139,66 @@ def all_articles():
         x["access_time"] = t[x["_id"]]
     return jsonify(articles)
 
+@app.route("/api/categories", methods=['POST'])
+def meta_categories():
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    print(user_id)
+    all_read = list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
+
+    return jsonify(list(db.articles.aggregate([{
+        "$match": {
+            "_id": {
+                "$in": all_read
+            }
+        } }, {
+            "$group": {
+                "_id": "$feed_id",
+                "count": {
+                    "$sum": 1
+                }
+            }
+        }, {
+            "$lookup": {
+                "from": "feeds",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "category_id"
+            }
+        }, {
+            "$project": {
+                "_id": 1,
+                "count": 1,
+                "category_id": {
+                    "$arrayElemAt": ["$category_id.category_id", 0]
+                }
+            }
+        }, {
+            "$group": {
+                "_id": "$category_id",
+                "count": {
+                    "$sum": "$count"
+                }
+            }
+        }, {
+            "$lookup": {
+                "from": "categories",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "category_id"
+            }
+        }, {
+            "$project": {
+                "_id": 1,
+                "count": 1,
+                "title": {
+                    "$arrayElemAt": ["$category_id.title", 0]
+                }
+            }
+        }])))
+
 @app.route("/api/sources", methods=['POST'])
-def sources():
+def meta_sources():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
     print(user_id)
