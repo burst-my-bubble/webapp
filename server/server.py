@@ -90,7 +90,7 @@ def articlesByCategory(category):
         feeds = list(map(lambda x: x["_id"], feeds))
         displayedArticles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)], skip=skip))
         addMetadata(displayedArticles)
-        return displayedArticles
+        return jsonify(displayedArticles)
 
 @app.route("/api/read", methods=['POST'])
 def read():
