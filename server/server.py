@@ -147,7 +147,7 @@ def articles():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
 
-    displayedArticles = get_best_matching_articles(skip) 
+    displayedArticles = get_best_matching_articles(user_id, skip) 
     addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
