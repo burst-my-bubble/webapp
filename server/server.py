@@ -8,6 +8,7 @@ import json
 import os
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+import facebook
 
 database_uri = "localhost"
 port = 5000
@@ -119,8 +120,12 @@ def get_best_matching_articles(skip):
 @app.route("/api/register_user", methods=['POST'])
 def register_user():
     content = request.json
-    iden = content["id"]
-    name = content["name"]
+    print(content)
+    access_token = content["access_token"]
+    graph = facebook.GraphAPI(access_token=access_token, version="3.1")
+    user = graph.get_object("me")
+    iden = user["id"]
+    name = user["name"]
     l = db.users.find_one_and_update({"id": iden}, {"$set":{"id": iden, "name": name}}, upsert=True, projection={"_id":1})
     return jsonify(l)
 

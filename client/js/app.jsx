@@ -13,16 +13,17 @@ class Login extends React.Component {
 
   componentDidMount() {
     window.login = () => {
-      FB.api("/me", ({id, name}) => {
-        axios.post(SERVER_URI + 'api/register_user', {
-          name: name,
-          id: id
-        })
-        .then((response) => {
-          console.log(response)
-          this.props.login(id, response.data._id);
-        
-        });  
+      FB.getLoginStatus((response) => {
+        if (response.status === 'connected') {
+          var accessToken = response.authResponse.accessToken;
+          axios.post(SERVER_URI + 'api/register_user', {
+            access_token: accessToken
+          })
+          .then((res) => {
+            console.log(response);
+            this.props.login(response.authResponse.userID, res.data._id);
+          });
+        } 
       });
     };
     FB.XFBML.parse();
@@ -267,18 +268,24 @@ const Comments = () =>
 const NoMatch = () =>
   <p>Page Not Found</p>;
 
-class Main extends React.Component {
-  constructor(props) {
-    super(props);
-
+class Navbar extends React.Component {
+  constructor() {
+    super();
     this.state = {
-      loaded: false
+      loaded: false,
+      dropdown: ""
     };
     axios.get(SERVER_URI + "api/categories").then(({data}) => {
       this.setState({
         loaded: true,
         data: data
       })
+    });
+  }
+
+  toggle() {
+    this.setState({
+      dropdown: this.state.dropdown === "" ? "show": ""
     });
   }
 
@@ -292,34 +299,40 @@ class Main extends React.Component {
         <Link className="nav-link" to={"/categories/" + category.slug}>{category.title}</Link>
       </li>);
 
+    return <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
+      <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li className="nav-item">
+          <Link className="navbar-brand" to="/">Burst My Bubble</Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/" className="nav-link">Home</Link>
+        </li>
+        {categories}
+      </ul>
+      <ul className="navbar-nav">
+        <li className="nav-item">
+          <img className="profile" onClick={this.toggle.bind(this)} src={"https://graph.facebook.com/" + this.props.id + "/picture?type=normal"}/>
+          <div className={"dropdown-menu dropdown-menu-right " + this.state.dropdown}>
+            <a className="dropdown-item" href="#">Action</a>
+            <Link to="/friends" className="dropdown-item">Friends</Link>
+            <Link to="/profile" className="dropdown-item">Profile</Link>
+            <div className="dropdown-divider"></div>
+            <button onClick={this.props.logout} className="btn dropdown-item btn-link" href="#">Logout</button>
+          </div>
+        </li>
+      </ul>
+    </nav>;
+  }
+}
+
+class Main extends React.Component {
+  render() {
     return <Router>
-      <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
-          <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li className="nav-item">
-              <Link className="navbar-brand" to="/">Burst My Bubble</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/" className="nav-link">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/friends" className="nav-link">Friends</Link>
-            </li>
-            {categories}
-            <li className="nav-item">
-              <button onClick={this.props.logout} className="btn btn-link nav-link" href="#">Logout</button>
-            </li>
-          </ul>
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link to="/profile">
-                <img className="profile" src={"https://graph.facebook.com/" + this.props.id + "/picture?type=normal"}/>
-              </Link>
-            </li>
-          </ul>
-        </nav>
+      <Navbar id={this.props.id} _id={this.props._id} logout={this.props.logout}/>
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/profile/:id" exact component={() => <Profile _id={this.match.params.id} id={this.props.id}/>}/>
         <Route path="/profile/sources" exact component={() => <ProfileSources _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/profile/categories" exact component={() => <ProfileCategories _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
@@ -330,7 +343,6 @@ class Main extends React.Component {
     </Router>;
   }
 }
-
 
 class Friends extends React.Component {
   constructor(props) {
@@ -382,6 +394,7 @@ class Home extends React.Component {
         url: nextProps.url
       });
     }
+    console.log("no change");
     return null;
   }
 

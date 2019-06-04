@@ -3,3 +3,4 @@ pymongo==3.8
 flask-cors==3.0.7
 sentry-sdk[flask]==0.8.0
 python-dateutil==2.7.3
+facebook-sdk==3.1.0
