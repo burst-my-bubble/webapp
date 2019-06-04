@@ -13,16 +13,17 @@ class Login extends React.Component {
 
   componentDidMount() {
     window.login = () => {
-      FB.api("/me", ({id, name}) => {
-        axios.post(SERVER_URI + 'api/register_user', {
-          name: name,
-          id: id
-        })
-        .then((response) => {
-          console.log(response)
-          this.props.login(id, response.data._id);
-        
-        });  
+      FB.getLoginStatus((response) => {
+        if (response.status === 'connected') {
+          var accessToken = response.authResponse.accessToken;
+          axios.post(SERVER_URI + 'api/register_user', {
+            access_token: accessToken
+          })
+          .then((res) => {
+            console.log(response);
+            this.props.login(response.authResponse.userID, res.data._id);
+          });
+        } 
       });
     };
     FB.XFBML.parse();
@@ -331,6 +332,7 @@ class Main extends React.Component {
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/profile/:id" exact component={() => <Profile _id={this.match.params.id} id={this.props.id}/>}/>
         <Route path="/profile/sources" exact component={() => <ProfileSources _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/profile/categories" exact component={() => <ProfileCategories _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
