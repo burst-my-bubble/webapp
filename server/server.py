@@ -34,13 +34,33 @@ def jsonify(obj):
 def get_new_mean(avg, new_value, total):
     return (avg * total + new_value) / (total + 1)
 
+#Gets a list of article ids of the user's history
+def get_user_article_history(user_id):
+    return list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
+
+
 #Choice can be "categories" or "entities", returning the history stats for that choice.
-def gen_history_stats(history, choice):
+def gen_category_stats(history):
     chosenList = []
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
-        for field in article[choice]:
+        for cat in getArticleCategory(article):
+            name = cat["slug"]
+            if name in chosenList:
+                (count, avgSentiment, avgBias) = chosenList[name]
+                chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
+            else:
+                chosenList[name] = (1, sentiment, bias)
+    return chosenList
+
+#Choice can be "categories" or "entities", returning the history stats for that choice.
+def gen_entity_stats(history):
+    chosenList = []
+    for article in history:
+        sentiment = article["sentiment"]
+        bias = 0.5 #article["sourceBias"]
+        for field in article["entities"]:
             name = field["name"]
             if name in chosenList:
                 (count, avgSentiment, avgBias) = chosenList[name]
@@ -62,7 +82,7 @@ def getDecayScore(article):
     return max(30 - 5 * divmod(duration.total_seconds, 3600)[0], 0)
 
 #Given an article and the history stats of that user, scores the article.
-def gen_entity_score(article, entityStats, categoryStats):
+def gen_article_score(article, entityStats, categoryStats):
     score = 0
 
     for entity in article["entities"]:
@@ -76,6 +96,22 @@ def gen_entity_score(article, entityStats, categoryStats):
     
     score = score + getDecayScore(article)
     return score
+
+def sortByScore(val):
+    return val["score"]
+
+def get_best_matching_articles(skip):
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    recent_read = get_user_article_history(user_id)[-120:]
+    history = list(db.articles.find({"_id":{"$in": recent_read}}))
+    entity_scores = gen_entity_stats(history)
+    category_scores = gen_category_stats(history)
+    for article in history:
+        article["score"] = gen_article_score(article, entity_scores, category_scores)
+
+    history.sort(key = sortByScore)
+    return history[skip: skip+12]
 
     
 
@@ -105,7 +141,7 @@ def articles():
             skip = int(skip)
         except:
             skip = 0
-    displayedArticles = list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip))
+    displayedArticles = get_best_matching_articles(skip) 
     addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
