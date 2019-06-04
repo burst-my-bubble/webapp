@@ -57,14 +57,16 @@ def articles():
             skip = 0
     displayedArticles = list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip))
     #allEntities = list(db.entities.find({"score": {"$gt": 3 }}))
-    
-    for article in displayedArticles:
-        entities = list(map(lambda x: x["displayName"], article["entities"]))
-        entities = db.entities.find({"displayName": {"$in" : entities}, "score": {"$gt": 3}}, sort=[("score", -1)], limit=5)
-        entities = list(entities)
-        article["entities"] = entities
+    addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
+
+def addMetadata(articles):
+    for article in articles:
+            entities = list(map(lambda x: x["name"], article["entities"]))
+            entities = db.entities.find({"name": {"$in" : entities}, "score": {"$gt": 2}, "bl": False}, sort=[("score", -1)], limit=5)
+            entities = list(entities)
+            article["entities"] = entities
 
 @app.route("/api/categories", methods=['GET'])
 def categories():
@@ -86,7 +88,9 @@ def articlesByCategory(category):
     else:
         feeds = db.feeds.find({"category_id": c["_id"]}, projection= {"_id": 1})
         feeds = list(map(lambda x: x["_id"], feeds))
-        return jsonify(list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)], skip=skip)))
+        displayedArticles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)], skip=skip))
+        addMetadata(displayedArticles)
+        return jsonify(displayedArticles)
 
 @app.route("/api/read", methods=['POST'])
 def read():
