@@ -30,6 +30,28 @@ def jsonify(obj):
     content = json.dumps(obj, default=json_util.default)
     return Response(content, 200, mimetype="application/json")
 
+def get_new_mean(avg, new_value, total):
+    return (avg * total + new_value) / (total + 1)
+
+#Choice can be "categories" or "entities", returning the history stats for that choice.
+def gen_history_stats(history, choice):
+    chosenList = []
+    for article in history:
+        sentiment = article["sentiment"]
+        bias = article["sourceBias"]
+        for field in article[choice]:
+            name = field["name"]
+            if name in chosenList:
+                (count, avgSentiment, avgBias) = chosenList[name]
+                chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
+            else:
+                chosenList[name] = (1, sentiment, bias)
+    return chosenList
+
+#Given an entity and the entity history stats, scores that entity.
+def gen_entity_score(entity, entityHistoryStat):
+    score = abs
+
 @app.route("/api/register_user", methods=['POST'])
 def register_user():
     content = request.json
@@ -56,7 +78,6 @@ def articles():
         except:
             skip = 0
     displayedArticles = list(db.articles.find(limit=12, sort=[("published_date", -1)], skip=skip))
-    #allEntities = list(db.entities.find({"score": {"$gt": 3 }}))
     addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
