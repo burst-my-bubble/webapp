@@ -57,7 +57,7 @@ def gen_category_stats(history):
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_entity_stats(history):
-    chosenList = []
+    chosenList = dict()
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
