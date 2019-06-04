@@ -77,7 +77,7 @@ def getArticleCategory(article):
 
 #Gets number of hours between article's publishing and now
 def getDecayScore(article):
-    article_datetime = dateutil.parser.parse(article["published_date"])
+    article_datetime = article["published_date"]
     now = datetime.now()
     duration = now - article_datetime
     return max(30 - 5 * divmod(duration.total_seconds, 3600)[0], 0)
