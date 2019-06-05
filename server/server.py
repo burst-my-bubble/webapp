@@ -83,7 +83,8 @@ def getDecayScore(article):
     article_datetime = article["published_date"]
     now = datetime.now()
     duration = now - article_datetime
-    return max(30 - 5 * divmod(duration.total_seconds(), 3600)[0], 0)
+    hours = max(30 - 5 * divmod(duration.total_seconds(), 3600)[0], 0)
+    return hours
 
 #Given an article and the history stats of that user, scores the article.
 def gen_article_score(article, entityStats, categoryStats):
@@ -218,7 +219,10 @@ def all_articles():
     content = request.json
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
-    all_read = db.users.find_one({"_id": user_id})["read"]
+    user = db.users.find_one({"_id": user_id})
+    if (user.get("read") is None):
+        user["read"] = []
+    all_read = user["read"]
     t = {}
     all_read2 = []
     for x in all_read:
