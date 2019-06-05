@@ -528,7 +528,7 @@ class Home extends React.Component {
           <div className="row">
 
             <div className="col-md-4">{previousPage}</div>
-            <div className="col-md-4" style={{paddingTop:"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
+            <div className="col-md-4" style={{paddingTop:"30px"}}><h1 className="text-center ikaros">{this.getTitle(this.state.url)}</h1></div>
             <div className="col-md-4">
               <button className="btn btn-secondary float-right" style={{marginTop:"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
             </div>
@@ -546,7 +546,7 @@ class Home extends React.Component {
     });
   }
 
-  getColour(sentiment){
+  getColour(sentiment) { 
     if(sentiment < 0.2){
       return "rgb(255, 0, 0)";
     } else if (sentiment < 0.4) {
@@ -558,6 +558,17 @@ class Home extends React.Component {
     }
     return "rgb(1, 255, 0)";
   }
+
+  getTitle(url) {
+    if (url == "") {
+      return "Your Feed";
+    } else {
+      var key = url.substr(1)
+      return key.charAt(0).toUpperCase() + key.slice(1) + " Feed";
+    }
+  }
+
+
 }
 
 window.ready = () => {
