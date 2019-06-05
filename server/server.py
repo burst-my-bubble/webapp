@@ -209,7 +209,8 @@ def friends():
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
     ids = db.users.find_one({"_id": user_id})["friends"]
-    return jsonify(list(db.users.find({"_id": {"$in": ids}})))
+    return jsonify(list(db.users.find({"_id": {"$in": ids}}, 
+        projection={"_id": 1, "id": 1, "name": 1})))
 
 
 @app.route("/api/all_articles", methods=['POST'])
