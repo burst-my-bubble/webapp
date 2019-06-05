@@ -82,9 +82,10 @@ def getArticleCategory(article):
 def getDecayScore(article):
     article_datetime = article["published_date"]
     now = datetime.now()
+    
     duration = now - article_datetime
-    hours = max(30 - 5 * divmod(duration.total_seconds(), 3600)[0], 0)
-    return hours
+    hours = duration.total_seconds() / 3600
+    return max(0, 30 - int(hours) * 5)
 
 #Given an article and the history stats of that user, scores the article.
 def gen_article_score(article, entityStats, categoryStats):
@@ -98,7 +99,6 @@ def gen_article_score(article, entityStats, categoryStats):
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
         score = score + 50
-    
     score = score + getDecayScore(article)
     return score
 
