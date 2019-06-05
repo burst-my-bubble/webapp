@@ -109,11 +109,12 @@ def get_best_matching_articles(user_id, skip):
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    for article in history:
+    all_articles = list(db.articles.find())
+    for article in all_articles:
         article["score"] = gen_article_score(article, entity_scores, category_scores)
 
-    history.sort(key = sortByScore)
-    return history[skip: skip+12]
+    all_articles.sort(key = sortByScore)
+    return all_articles[skip: skip+12]
 
 def pick(a, prop):
     return [x[prop] for x in a]
