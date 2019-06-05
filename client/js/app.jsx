@@ -207,7 +207,14 @@ class Profile extends React.Component {
 <br/>
  <div className="row">
    <div className="col-md-3">
-   <CalendarHeatmap
+     <div className="sidebar">
+        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.props.id + "/picture?width=900"}/>
+        <br/><br/>
+        <h2 style={{textAlign:"center"}}>Jane Doe</h2>
+        <p style={{textAlign:"center"}}>User since 23rd April 2019</p>
+     </div>
+     <br/>
+     <CalendarHeatmap
   startDate={TODAY_365}
   endDate={TODAY}
   values={tMap}
@@ -220,16 +227,20 @@ class Profile extends React.Component {
   }}
 />
    </div>
-   <div className="col-md-3">
-     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
-   </div>
-   <div className="col-md-3">
-     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
-   </div>
-   <div className="col-md-3">
+   <div className="col-md-9">
+     <div className="row">
 
+   <div className="col-md-4">
+   
    </div>
- </div>
+   <div className="col-md-4">
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
+   </div>
+   <div className="col-md-4">
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
+   </div>
+   </div>
+  
       
 <br/>
         <h4>Today</h4>
@@ -238,7 +249,10 @@ class Profile extends React.Component {
         {this.toHtml(notTodayButLastWeek)}
         <h4>Last Month</h4>
         {this.toHtml(lastMonth)}
-    </div>;
+    </div>
+    </div>
+
+</div>;
   }
 
   daysBetween(first, second) {
@@ -249,7 +263,6 @@ class Profile extends React.Component {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
         <td><a href={article.url}>{article.title}</a></td> 
-        <td>{article.access_time.toString()}</td>
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
