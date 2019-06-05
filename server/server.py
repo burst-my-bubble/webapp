@@ -112,7 +112,7 @@ def get_best_matching_articles(user_id, skip):
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    all_articles = list(db.articles.find())
+    all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
     for article in all_articles:
         article["score"] = gen_article_score(article, entity_scores, category_scores)
 
