@@ -94,7 +94,7 @@ def getDecayScore(article):
     return 30 - int(hours)
 
 #Given an article and the history stats of that user, scores the article.
-def gen_article_score(article, entityStats, categoryStats):
+def gen_article_score(article, entityStats, categoryStats, is_in_history):
     score = 0
     for entity in article["entities"]:
         name = entity["name"]
@@ -104,6 +104,9 @@ def gen_article_score(article, entityStats, categoryStats):
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
         score = score + 50
+    
+    if is_in_history:
+        score = score - 50
 
     score = score + getDecayScore(article)
     return score
@@ -116,8 +119,6 @@ def get_best_matching_articles(user_id, skip, category_id):
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    print("entity_scores:",entity_scores)
-    print("category_scores:", category_scores)
     if category_id is None:
         all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
     else:
@@ -125,7 +126,7 @@ def get_best_matching_articles(user_id, skip, category_id):
         feeds = list(map(lambda x: x["_id"], feeds))
         all_articles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=120, sort=[("published_date", -1)]))
     for article in all_articles:
-        article["score"] = gen_article_score(article, entity_scores, category_scores)
+        article["score"] = gen_article_score(article, entity_scores, category_scores, article in history)
 
     all_articles.sort(key = sortByScore)
     return all_articles[skip: skip+12]
