@@ -471,14 +471,14 @@ class Home extends React.Component {
   }
 
   loadData() {
-    var skip = this.state.page * 12;
+    var page = this.state.page;
+    var skip = page * 12;
     axios.post(SERVER_URI + "api/articles" + this.state.url + "?skip=" + skip, {user_id: this.props._id}).then(({data}) => {
       this.setState({
         loaded: true,
         data: data,
-        page: 0,
         loadedUrl: this.state.url,
-        loadedPage: 0
+        loadedPage: page
       });
     });
   }
@@ -520,13 +520,13 @@ class Home extends React.Component {
       </div>;
     });
     var previousPage = null;
-    if (this.state.page != 0) {
+    if (this.state.loadedPage != 0) {
       var previousPage = <button className="btn btn-secondary" onClick={this.previousPage.bind(this)}>Previous Page</button>
     }
     return <div>
         <div className="container">
           <div className="row">
-            <div className="col-md-4 "></div>
+            <div className="col-md-4">{previousPage}</div>
             <div className="col-md-4" style={{"padding-top":"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
             <div className="col-md-4">
               <button className="btn btn-secondary float-right" style={{"margin-top":"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
