@@ -214,6 +214,7 @@ class Profile extends React.Component {
         <p style={{textAlign:"center"}}>User since 23rd April 2019</p>
      </div>
      <br/>
+     <div className="stat">
      <CalendarHeatmap
   startDate={TODAY_365}
   endDate={TODAY}
@@ -226,12 +227,14 @@ class Profile extends React.Component {
     return `color-scale-${value.count}`;
   }}
 />
+     </div>
+     
    </div>
    <div className="col-md-9">
      <div className="row">
 
    <div className="col-md-4">
-   
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>5</Link></h1> day streak.</div>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
@@ -243,12 +246,15 @@ class Profile extends React.Component {
   
       
 <br/>
-        <h4>Today</h4>
+  <div className="stat">
+  <h4>Today</h4>
         {this.toHtml(today)}
         <h4>Last Week</h4>
         {this.toHtml(notTodayButLastWeek)}
         <h4>Last Month</h4>
         {this.toHtml(lastMonth)}
+  </div>
+        
     </div>
     </div>
 
