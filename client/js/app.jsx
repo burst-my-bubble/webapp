@@ -275,6 +275,7 @@ class Navbar extends React.Component {
       loaded: false,
       dropdown: ""
     };
+    this.eventHandler = this.handleClick.bind(this); 
     axios.get(SERVER_URI + "api/categories").then(({data}) => {
       this.setState({
         loaded: true,
@@ -283,7 +284,22 @@ class Navbar extends React.Component {
     });
   }
 
-  toggle() {
+  handleClick() {
+    this.setState({
+      dropdown: ""
+    });
+  }
+
+  componentDidMount() {
+    document.body.addEventListener("click", this.eventHandler);
+  }
+
+  componentWillUnmount() {
+    document.body.removeEventListener("click", this.eventHandler);
+  }
+
+  toggle(e) {
+    e.stopPropagation();
     this.setState({
       dropdown: this.state.dropdown === "" ? "show": ""
     });
@@ -394,7 +410,6 @@ class Home extends React.Component {
         url: nextProps.url
       });
     }
-    console.log("no change");
     return null;
   }
 
