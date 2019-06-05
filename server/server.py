@@ -199,6 +199,15 @@ def read():
     db.users.update_one({"_id": user_id, "read.article_id": {"$ne": article_id}}, {"$push": {"read":{"article_id": article_id, "time": datetime.now()}}})
     return jsonify({})
 
+@app.route("/api/friends", methods=['POST'])
+def friends():
+    content = request.json
+    print(content)
+    user_id = ObjectId(content["user_id"]["$oid"])
+    ids = db.users.find_one({"_id": user_id})["friends"]
+    return jsonify(list(db.users.find({"_id": {"$in": ids}})))
+
+
 @app.route("/api/all_articles", methods=['POST'])
 def all_articles():
     content = request.json

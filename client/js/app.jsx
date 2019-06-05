@@ -366,7 +366,7 @@ class Friends extends React.Component {
     this.state = {
       loaded: false
     }
-    FB.api("/" + props.id + "/friends", ({data}) => {
+    axios.post(SERVER_URI + "api/friends", {user_id: this.props._id}).then(({data}) => {
       this.setState({
         data: data,
         loaded: true
@@ -379,6 +379,7 @@ class Friends extends React.Component {
       return null;
     }
 
+    console.log(this.state.data);
     const people = this.state.data.map(({id, name}) => {
       return <div className="card col-md-3" key={id}>
         <img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/>
