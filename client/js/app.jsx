@@ -155,11 +155,16 @@ class Profile extends React.Component {
     };
     axios.post(SERVER_URI + "api/all_articles", {user_id: props._id}).then(({data}) => {
       console.log("helloao");
-      this.setState({
-        loaded: true,
-        data: data
+      axios.post(SERVER_URI + "api/get_name", {user_id: props._id}).then((a) => {
+        console.log("tester");
+        this.setState({
+          loaded: true,
+          data: data,
+          data2: a.data
+        });
       });
     });
+
   }
   render() {
     if (!this.state.loaded) {
@@ -178,6 +183,8 @@ class Profile extends React.Component {
     var today = lastWeek.filter(a => this.sameDay(a.access_time, TODAY));
     var notTodayButLastWeek = lastWeek.filter(a => !this.sameDay(a.access_time, TODAY));
     var lastMonth = articles.filter(a => this.daysBetween(a.access_time, TODAY) > 7);
+
+    var joinDate = new Date(this.state.data2["joined"].$date);
 
     var map = {};
     articles.forEach(a => {
@@ -210,8 +217,8 @@ class Profile extends React.Component {
      <div className="sidebar stat">
         <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.props.id + "/picture?width=900"}/>
         <br/><br/>
-        <h2 style={{textAlign:"center"}}>Jane Doe</h2>
-        <p style={{textAlign:"center"}}>User since 23rd April 2019</p>
+        <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
+        <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
      </div>
      <br/>
      <div className="stat">
