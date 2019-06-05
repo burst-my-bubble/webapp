@@ -37,7 +37,10 @@ def get_new_mean(avg, new_value, total):
 
 #Gets a list of article ids of the user's history
 def get_user_article_history(user_id):
-    return list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
+    user = db.users.find_one({"_id": user_id})
+    if (user.get("read") is None):
+        user["read"] = []
+    return list(map(lambda x: x["article_id"], user["read"]))
 
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
@@ -106,11 +109,12 @@ def get_best_matching_articles(user_id, skip):
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    for article in history:
+    all_articles = list(db.articles.find())
+    for article in all_articles:
         article["score"] = gen_article_score(article, entity_scores, category_scores)
 
-    history.sort(key = sortByScore)
-    return history[skip: skip+12]
+    all_articles.sort(key = sortByScore)
+    return all_articles[skip: skip+12]
 
 def pick(a, prop):
     return [x[prop] for x in a]
