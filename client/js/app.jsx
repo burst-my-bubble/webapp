@@ -453,7 +453,7 @@ class Home extends React.Component {
         return <span key={e.displayName} className="badge badge-secondary">{e.displayName}</span>;
       });
       return <div className="col-md-3" key={id}>
-        <div className="card article">
+        <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
             <img src={article.image_url} className="card-img-top"/>
           </a>
@@ -472,9 +472,9 @@ class Home extends React.Component {
         <div className="container">
           <div className="row">
             <div className="col-md-4 "></div>
-            <div className="col-md-4" style={{"padding-top":"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
+            <div className="col-md-4" style={{paddingTop:"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
             <div className="col-md-4">
-              <button className="btn btn-secondary float-right" style={{"margin-top":"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
+              <button className="btn btn-secondary float-right" style={{marginTop:"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
             </div>
           </div>
           <div className="row">
