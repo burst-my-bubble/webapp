@@ -107,16 +107,22 @@ def gen_article_score(article, entityStats, categoryStats):
 def sortByScore(val):
     return val["score"]
 
-def get_best_matching_articles(user_id, skip):
+def get_best_matching_articles(user_id, skip, category_id):
     recent_read = get_user_article_history(user_id)[-120:]
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
+    if category_id is None:
+        all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
+    else:
+        feeds = db.feeds.find({"category_id": category_id["_id"]}, projection= {"_id": 1})
+        feeds = list(map(lambda x: x["_id"], feeds))
+        all_articles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=120, sort=[("published_date", -1)]))
     for article in all_articles:
         article["score"] = gen_article_score(article, entity_scores, category_scores)
 
     all_articles.sort(key = sortByScore)
+        
     return all_articles[skip: skip+12]
 
 def pick(a, prop):
@@ -160,7 +166,7 @@ def articles():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
 
-    displayedArticles = get_best_matching_articles(user_id, skip) 
+    displayedArticles = get_best_matching_articles(user_id, skip, None) 
     addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
@@ -176,9 +182,11 @@ def addMetadata(articles):
 def categories():
     return jsonify(list(db.categories.find()))
 
-@app.route("/api/articles/<category>", methods=['GET'])
+@app.route("/api/articles/<category>", methods=['POST'])
 def articlesByCategory(category):
     skip = request.args.get("skip")
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
     if skip == None:
         skip = 0
     else:
@@ -190,9 +198,7 @@ def articlesByCategory(category):
     if c is None:
         return jsonify([])
     else:
-        feeds = db.feeds.find({"category_id": c["_id"]}, projection= {"_id": 1})
-        feeds = list(map(lambda x: x["_id"], feeds))
-        displayedArticles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)], skip=skip))
+        displayedArticles = get_best_matching_articles(user_id, skip, c)
         addMetadata(displayedArticles)
         return jsonify(displayedArticles)
 
