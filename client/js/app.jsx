@@ -521,7 +521,7 @@ class Home extends React.Component {
     });
     var previousPage = null;
     if (this.state.loadedPage != 0) {
-      var previousPage = <button className="btn btn-secondary" onClick={this.previousPage.bind(this)}>Previous Page</button>
+      var previousPage = <button className="btn btn-secondary" style={{marginTop: "30px"}} onClick={this.previousPage.bind(this)}>Previous Page</button>
     }
     return <div>
         <div className="container">
