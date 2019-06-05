@@ -37,27 +37,30 @@ def get_new_mean(avg, new_value, total):
 
 #Gets a list of article ids of the user's history
 def get_user_article_history(user_id):
-    return list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
+    user = db.users.find_one({"_id": user_id})
+    if (user.get("read") is None):
+        user["read"] = []
+    return list(map(lambda x: x["article_id"], user["read"]))
 
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_category_stats(history):
-    chosenList = []
+    chosenList = dict()
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
-        for cat in getArticleCategory(article):
-            name = cat["slug"]
-            if name in chosenList:
-                (count, avgSentiment, avgBias) = chosenList[name]
-                chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
-            else:
-                chosenList[name] = (1, sentiment, bias)
+        cat = getArticleCategory(article)
+        name = cat
+        if name in chosenList:
+            (count, avgSentiment, avgBias) = chosenList[name]
+            chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
+        else:
+            chosenList[name] = (1, sentiment, bias)
     return chosenList
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_entity_stats(history):
-    chosenList = []
+    chosenList = dict()
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
@@ -72,15 +75,19 @@ def gen_entity_stats(history):
 
 #Gets the category of an article
 def getArticleCategory(article):
-    category_id = db.feeds.find({"_id": article["feed_id"]})["category_id"]
-    return db.categories.find({"_id": category_id})["slug"]
+    category_id = db.feeds.find_one({"_id": article["feed_id"]})["category_id"]
+    return db.categories.find_one({"_id": category_id})["slug"]
 
 #Gets number of hours between article's publishing and now
 def getDecayScore(article):
-    article_datetime = dateutil.parser.parse(article["published_date"])
+    article_datetime = article["published_date"]
+    if article_datetime is None:
+        return 0
     now = datetime.now()
+    
     duration = now - article_datetime
-    return max(30 - 5 * divmod(duration.total_seconds, 3600)[0], 0)
+    hours = duration.total_seconds() / 3600
+    return max(0, 30 - int(hours) * 5)
 
 #Given an article and the history stats of that user, scores the article.
 def gen_article_score(article, entityStats, categoryStats):
@@ -94,7 +101,6 @@ def gen_article_score(article, entityStats, categoryStats):
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
         score = score + 50
-    
     score = score + getDecayScore(article)
     return score
 
@@ -106,14 +112,15 @@ def get_best_matching_articles(user_id, skip):
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    for article in history:
+    all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
+    for article in all_articles:
         article["score"] = gen_article_score(article, entity_scores, category_scores)
 
-    history.sort(key = sortByScore)
-    return history[skip: skip+12]
+    all_articles.sort(key = sortByScore)
+    return all_articles[skip: skip+12]
 
-    
-
+def pick(a, prop):
+    return [x[prop] for x in a]
 
 @app.route("/api/register_user", methods=['POST'])
 def register_user():
@@ -124,7 +131,13 @@ def register_user():
     user = graph.get_object("me")
     iden = user["id"]
     name = user["name"]
-    l = db.users.find_one_and_update({"id": iden}, {"$set":{"id": iden, "name": name}}, upsert=True, projection={"_id":1})
+    ids = pick(graph.get_object("me/friends")["data"], "id")
+    friends = list(db.users.find({"id": {"$in": ids}}, projection={"_id":1}))
+    friends = pick(friends, "_id")
+    l = db.users.find_one_and_update({"id": iden}, 
+        {"$set":{"id": iden, "name": name, "friends": friends}}, 
+        upsert=True, projection={"_id":1})
+    
     return jsonify(l)
 
 @app.route("/api/get_user_id", methods=['POST'])
@@ -147,7 +160,7 @@ def articles():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
 
-    displayedArticles = get_best_matching_articles(skip) 
+    displayedArticles = get_best_matching_articles(user_id, skip) 
     addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
@@ -193,12 +206,25 @@ def read():
     db.users.update_one({"_id": user_id, "read.article_id": {"$ne": article_id}}, {"$push": {"read":{"article_id": article_id, "time": datetime.now()}}})
     return jsonify({})
 
+@app.route("/api/friends", methods=['POST'])
+def friends():
+    content = request.json
+    print(content)
+    user_id = ObjectId(content["user_id"]["$oid"])
+    ids = db.users.find_one({"_id": user_id})["friends"]
+    return jsonify(list(db.users.find({"_id": {"$in": ids}}, 
+        projection={"_id": 1, "id": 1, "name": 1})))
+
+
 @app.route("/api/all_articles", methods=['POST'])
 def all_articles():
     content = request.json
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
-    all_read = db.users.find_one({"_id": user_id})["read"]
+    user = db.users.find_one({"_id": user_id})
+    if (user.get("read") is None):
+        user["read"] = []
+    all_read = user["read"]
     t = {}
     all_read2 = []
     for x in all_read:
