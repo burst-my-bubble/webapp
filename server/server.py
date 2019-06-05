@@ -58,15 +58,19 @@ def gen_category_stats(history):
             chosenList[name] = (1, sentiment, bias)
     return chosenList
 
+def get_blacklisted_entities():
+    return list(db.entities.find({"bl": True}))
+
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_entity_stats(history):
     chosenList = dict()
+    blacklist = map(lambda x: x["name"], get_blacklisted_entities())
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
         for field in article["entities"]:
             name = field["name"]
-            if name in chosenList:
+            if name in chosenList and not name in blacklist:
                 (count, avgSentiment, avgBias) = chosenList[name]
                 chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
             else:
@@ -81,38 +85,48 @@ def getArticleCategory(article):
 #Gets number of hours between article's publishing and now
 def getDecayScore(article):
     article_datetime = article["published_date"]
+    if article_datetime is None:
+        return 0
     now = datetime.now()
     
     duration = now - article_datetime
     hours = duration.total_seconds() / 3600
-    return max(0, 30 - int(hours) * 5)
+    return 30 - int(hours)
 
 #Given an article and the history stats of that user, scores the article.
-def gen_article_score(article, entityStats, categoryStats):
+def gen_article_score(article, entityStats, categoryStats, is_in_history):
     score = 0
-
     for entity in article["entities"]:
         name = entity["name"]
         if name in entityStats: #not taking into account any count, sentiment, bias yet
-            score = score + 30
+            score = score + 10
 
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
         score = score + 50
+    
+    if is_in_history:
+        score = score - 50
+
     score = score + getDecayScore(article)
     return score
 
 def sortByScore(val):
     return val["score"]
 
-def get_best_matching_articles(user_id, skip):
+def get_best_matching_articles(user_id, skip, category_id):
     recent_read = get_user_article_history(user_id)[-120:]
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
-    all_articles = list(db.articles.find())
+    if category_id is None:
+        all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
+    else:
+        feeds = db.feeds.find({"category_id": category_id["_id"]}, projection= {"_id": 1})
+        feeds = list(map(lambda x: x["_id"], feeds))
+        all_articles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=120, sort=[("published_date", -1)]))
     for article in all_articles:
-        article["score"] = gen_article_score(article, entity_scores, category_scores)
+        article["score"] = gen_article_score(article, entity_scores, category_scores, article in history)
 
     all_articles.sort(key = sortByScore)
     return all_articles[skip: skip+12]
@@ -158,7 +172,7 @@ def articles():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
 
-    displayedArticles = get_best_matching_articles(user_id, skip) 
+    displayedArticles = get_best_matching_articles(user_id, skip, None) 
     addMetadata(displayedArticles)
 
     return jsonify(displayedArticles)
@@ -174,9 +188,11 @@ def addMetadata(articles):
 def categories():
     return jsonify(list(db.categories.find()))
 
-@app.route("/api/articles/<category>", methods=['GET'])
+@app.route("/api/articles/<category>", methods=['POST'])
 def articlesByCategory(category):
     skip = request.args.get("skip")
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
     if skip == None:
         skip = 0
     else:
@@ -188,9 +204,7 @@ def articlesByCategory(category):
     if c is None:
         return jsonify([])
     else:
-        feeds = db.feeds.find({"category_id": c["_id"]}, projection= {"_id": 1})
-        feeds = list(map(lambda x: x["_id"], feeds))
-        displayedArticles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=12, sort=[("published_date", -1)], skip=skip))
+        displayedArticles = get_best_matching_articles(user_id, skip, c)
         addMetadata(displayedArticles)
         return jsonify(displayedArticles)
 
