@@ -220,10 +220,10 @@ class Profile extends React.Component {
 />
    </div>
    <div className="col-md-3">
-     <div className="card"><h1><Link to="/profile/categories">75</Link></h1> articles read this week. Technology being your favourite category.</div>
+     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
    </div>
    <div className="col-md-3">
-     <div className="card"><h1><Link to="/profile/sources">10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
+     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
    </div>
    <div className="col-md-3">
 
@@ -331,7 +331,7 @@ class Navbar extends React.Component {
           <div className={"dropdown-menu dropdown-menu-right " + this.state.dropdown}>
             <a className="dropdown-item" href="#">Action</a>
             <Link to="/friends" className="dropdown-item">Friends</Link>
-            <Link to="/profile" className="dropdown-item">Profile</Link>
+            <Link to={"/user/" + this.props._id["$oid"]} className="dropdown-item">Profile</Link>
             <div className="dropdown-divider"></div>
             <button onClick={this.props.logout} className="btn dropdown-item btn-link" href="#">Logout</button>
           </div>
@@ -347,9 +347,8 @@ class Main extends React.Component {
       <Navbar id={this.props.id} _id={this.props._id} logout={this.props.logout}/>
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
-        <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
-        <Route path="/profile/sources" exact component={() => <ProfileSources _id={this.props._id} id={this.props.id}/>}/>
-        <Route path="/profile/categories" exact component={() => <ProfileCategories _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  id={this.props.id}/>}/>
+        <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/user/:id" exact component={({match}) => <Profile _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
