@@ -350,7 +350,7 @@ class Main extends React.Component {
         <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/profile/sources" exact component={() => <ProfileSources _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/profile/categories" exact component={() => <ProfileCategories _id={this.props._id} id={this.props.id}/>}/>
-        <Route path="/profile/:id" exact component={() => <Profile _id={this.match.params.id} id={this.props.id}/>}/>
+        <Route path="/user/:id" exact component={({match}) => <Profile _id={match.params.id} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
@@ -380,9 +380,9 @@ class Friends extends React.Component {
     }
 
     console.log(this.state.data);
-    const people = this.state.data.map(({id, name}) => {
+    const people = this.state.data.map(({_id, id, name}) => {
       return <div className="card col-md-3" key={id}>
-        <img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/>
+        <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
         <h4>{name}</h4>
       </div>
     });
