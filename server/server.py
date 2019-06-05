@@ -99,11 +99,11 @@ def gen_article_score(article, entityStats, categoryStats, is_in_history):
     for entity in article["entities"]:
         name = entity["name"]
         if name in entityStats: #not taking into account any count, sentiment, bias yet
-            score = score + 10
+            score = score + entityStats[name][0] * 10
 
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
-        score = score + 50
+        score = score + categoryStats[name][0] * 10
     
     if is_in_history:
         score = score - 50
