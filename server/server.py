@@ -58,15 +58,19 @@ def gen_category_stats(history):
             chosenList[name] = (1, sentiment, bias)
     return chosenList
 
+def get_blacklisted_entities():
+    return list(db.entities.find({"bl": True}))
+
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_entity_stats(history):
     chosenList = dict()
+    blacklist = map(lambda x: x["name"], get_blacklisted_entities())
     for article in history:
         sentiment = article["sentiment"]
         bias = 0.5 #article["sourceBias"]
         for field in article["entities"]:
             name = field["name"]
-            if name in chosenList:
+            if name in chosenList and not name in blacklist:
                 (count, avgSentiment, avgBias) = chosenList[name]
                 chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
             else:
@@ -87,20 +91,20 @@ def getDecayScore(article):
     
     duration = now - article_datetime
     hours = duration.total_seconds() / 3600
-    return max(0, 30 - int(hours) * 5)
+    return 30 - int(hours)
 
 #Given an article and the history stats of that user, scores the article.
 def gen_article_score(article, entityStats, categoryStats):
     score = 0
-
     for entity in article["entities"]:
         name = entity["name"]
         if name in entityStats: #not taking into account any count, sentiment, bias yet
-            score = score + 30
+            score = score + 10
 
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
         score = score + 50
+
     score = score + getDecayScore(article)
     return score
 
@@ -112,6 +116,8 @@ def get_best_matching_articles(user_id, skip, category_id):
     history = list(db.articles.find({"_id":{"$in": recent_read}}))
     entity_scores = gen_entity_stats(history)
     category_scores = gen_category_stats(history)
+    print("entity_scores:",entity_scores)
+    print("category_scores:", category_scores)
     if category_id is None:
         all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
     else:
@@ -122,7 +128,6 @@ def get_best_matching_articles(user_id, skip, category_id):
         article["score"] = gen_article_score(article, entity_scores, category_scores)
 
     all_articles.sort(key = sortByScore)
-        
     return all_articles[skip: skip+12]
 
 def pick(a, prop):
