@@ -37,7 +37,10 @@ def get_new_mean(avg, new_value, total):
 
 #Gets a list of article ids of the user's history
 def get_user_article_history(user_id):
-    return list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
+    user = db.users.find_one({"_id": user_id})
+    if (user.get("read") is None):
+        user["read"] = []
+    return list(map(lambda x: x["article_id"], user["read"]))
 
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
