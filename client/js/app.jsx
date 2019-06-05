@@ -207,7 +207,7 @@ class Profile extends React.Component {
 <br/>
  <div className="row">
    <div className="col-md-3">
-     <div className="sidebar">
+     <div className="sidebar stat">
         <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.props.id + "/picture?width=900"}/>
         <br/><br/>
         <h2 style={{textAlign:"center"}}>Jane Doe</h2>
