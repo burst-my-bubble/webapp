@@ -517,7 +517,7 @@ class Home extends React.Component {
         return <span key={e.displayName} className="badge badge-secondary">{e.displayName}</span>;
       });
       return <div className="col-md-3" key={id}>
-        <div className="card article">
+        <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
             <img src={article.image_url} className="card-img-top"/>
           </a>
@@ -539,10 +539,11 @@ class Home extends React.Component {
     return <div>
         <div className="container">
           <div className="row">
+
             <div className="col-md-4">{previousPage}</div>
-            <div className="col-md-4" style={{"padding-top":"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
+            <div className="col-md-4" style={{paddingTop:"30px"}}><h1 className="text-center ikaros">{this.getTitle(this.state.url)}</h1></div>
             <div className="col-md-4">
-              <button className="btn btn-secondary float-right" style={{"margin-top":"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
+              <button className="btn btn-secondary float-right" style={{marginTop:"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
             </div>
           </div>
           <div className="row">
@@ -558,7 +559,7 @@ class Home extends React.Component {
     });
   }
 
-  getColour(sentiment){
+  getColour(sentiment) { 
     if(sentiment < 0.2){
       return "rgb(255, 0, 0)";
     } else if (sentiment < 0.4) {
@@ -570,6 +571,17 @@ class Home extends React.Component {
     }
     return "rgb(1, 255, 0)";
   }
+
+  getTitle(url) {
+    if (url == "") {
+      return "Your Feed";
+    } else {
+      var key = url.substr(1)
+      return key.charAt(0).toUpperCase() + key.slice(1) + " Feed";
+    }
+  }
+
+
 }
 
 window.ready = () => {
