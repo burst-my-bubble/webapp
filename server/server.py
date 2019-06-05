@@ -94,16 +94,18 @@ def getDecayScore(article):
     return 30 - int(hours)
 
 #Given an article and the history stats of that user, scores the article.
+#Stats are of the form (count, avgSentiment, avgEntities)
 def gen_article_score(article, entityStats, categoryStats, is_in_history):
     score = 0
     for entity in article["entities"]:
         name = entity["name"]
         if name in entityStats: #not taking into account any count, sentiment, bias yet
-            score = score + 10
+            #Increments score by the amount of times that entity is in user's history
+            score = score + entityStats[name][0] * 10
 
     name = getArticleCategory(article)
     if name in categoryStats: #not taking into account any count, sentiment, bias yet
-        score = score + 50
+        score = score + categoryStats[name][0] * 10
     
     if is_in_history:
         score = score - 50
@@ -112,7 +114,7 @@ def gen_article_score(article, entityStats, categoryStats, is_in_history):
     return score
 
 def sortByScore(val):
-    return val["score"]
+    return -val["score"]
 
 def get_best_matching_articles(user_id, skip, category_id):
     recent_read = get_user_article_history(user_id)[-120:]

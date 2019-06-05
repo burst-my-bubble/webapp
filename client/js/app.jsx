@@ -4,6 +4,7 @@ import axios from "axios";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import CalendarHeatmap from 'react-calendar-heatmap';
 
+
 class Login extends React.Component {
   render() {
     return (
@@ -312,7 +313,7 @@ class Navbar extends React.Component {
 
     const categories = this.state.data.map((category) => 
       <li className="nav-item" key={category._id["$oid"]}>
-        <Link className="nav-link" to={"/categories/" + category.slug}>{category.title}</Link>
+        <Link className="nav-link ikaros" to={"/categories/" + category.slug}>{category.title}</Link>
       </li>);
 
     return <nav className="navbar navbar-dark navbar-expand-lg bg-primary">
@@ -507,7 +508,7 @@ class Home extends React.Component {
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
             <img src={article.image_url} className="card-img-top"/>
           </a>
-          <div className="card-body">
+          <div className="card-body body-font">
             <p className="card-text">
               <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
             </p>
@@ -526,9 +527,9 @@ class Home extends React.Component {
         <div className="container">
           <div className="row">
             <div className="col-md-4 "></div>
-            <div className="col-md-4"><h1 className="text-center">Front Page</h1></div>
+            <div className="col-md-4" style={{"padding-top":"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
             <div className="col-md-4">
-              <button className="btn btn-secondary float-right" onClick={this.nextPage.bind(this)}>Next Page</button>
+              <button className="btn btn-secondary float-right" style={{"margin-top":"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
             </div>
           </div>
           <div className="row">
