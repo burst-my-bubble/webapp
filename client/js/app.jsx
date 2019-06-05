@@ -328,7 +328,7 @@ class Navbar extends React.Component {
         <li className="nav-item">
           <img className="profile" onClick={this.toggle.bind(this)} src={"https://graph.facebook.com/" + this.props.id + "/picture?type=normal"}/>
           <div className={"dropdown-menu dropdown-menu-right " + this.state.dropdown}>
-            <a className="dropdown-item" href="#">Action</a>
+            <Link to="/settings" className="dropdown-item">Settings</Link>
             <Link to="/friends" className="dropdown-item">Friends</Link>
             <Link to={"/user/" + this.props._id["$oid"]} className="dropdown-item">Profile</Link>
             <div className="dropdown-divider"></div>
@@ -337,6 +337,51 @@ class Navbar extends React.Component {
         </li>
       </ul>
     </nav>;
+  }
+}
+
+class Settings extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      loaded: false,
+      dropdown: ""
+    };
+    axios.get(SERVER_URI + "api/categories").then(({data}) => {
+      this.setState({
+        loaded: true,
+        data: data,
+        selected: []
+      })
+    });
+  }
+
+  render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    const categories = this.state.data.map(({title, slug}) => {
+      var css = (this.state.selected.includes(slug)) ? "active" : "";
+      return <button key={slug} onClick={() => {
+        var t = this.state.selected;
+        if (!t.includes(slug)) {
+          t = [slug].concat(t);
+        } else {
+          t = t.filter(a => a != slug);
+        }
+        this.setState({selected:t});
+      }} className={"list-group-item list-group-item-action " + css}>
+        {title}
+      </button>;
+    });
+    return <div className="container">
+      <br/><label>Filter which categories you wish to see:</label>
+      <div className="list-group">
+        {categories}
+      </div>
+      <button>Save</button>
+    </div>;
   }
 }
 
@@ -352,7 +397,8 @@ class Main extends React.Component {
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
-        <Route component={NoMatch}></Route>
+        <Route path="/settings" exact component={() => <Settings _id={this.props._id} id={this.props.id}/>}/>
+        <Route component={NoMatch}/>
       </Switch>
     </Router>;
   }
@@ -398,7 +444,8 @@ class Home extends React.Component {
     super(props);
     this.state = {
       loaded: false,
-      url: props.url
+      url: props.url,
+      page: 0
     };
     console.log(props.url);
   }
@@ -417,31 +464,35 @@ class Home extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!this.state.loaded || this.state.url !== this.state.loadedUrl) {
+    if (!this.state.loaded || this.state.url !== this.state.loadedUrl || this.state.page !== this.state.loadedPage) {
       this.loadData();
     }
   }
 
   loadData() {
-    axios.post(SERVER_URI + "api/articles" + this.state.url, {user_id: this.props._id}).then(({data}) => {
+    var skip = this.state.page * 12;
+    axios.post(SERVER_URI + "api/articles" + this.state.url + "?skip=" + skip, {user_id: this.props._id}).then(({data}) => {
       this.setState({
         loaded: true,
         data: data,
         page: 0,
-        loadedUrl: this.state.url
+        loadedUrl: this.state.url,
+        loadedPage: 0
       });
     });
   }
 
   nextPage() {
     var nextPage = this.state.page + 1;
-    var skip = nextPage * 12;
-    axios.post(SERVER_URI + "api/articles" + this.props.url + "?skip=" + skip, {user_id: this.props._id}).then(({data}) => {
-      this.setState({
-        loaded: true,
-        data: data,
-        page: nextPage
-      });
+    this.setState({
+      page: nextPage
+    });
+  }
+
+  previousPage() {
+    var previousPage = this.state.page - 1;
+    this.setState({
+      page: previousPage
     });
   }
 
@@ -467,6 +518,10 @@ class Home extends React.Component {
         </div>
       </div>;
     });
+    var previousPage = null;
+    if (this.state.page != 0) {
+      var previousPage = <button className="btn btn-secondary" onClick={this.previousPage.bind(this)}>Previous Page</button>
+    }
     return <div>
         <div className="container">
           <div className="row">
