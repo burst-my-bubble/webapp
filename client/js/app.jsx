@@ -91,8 +91,8 @@ class ProfileSources extends React.Component {
 
     const entries = this.state.data.sort((a, b) => {
       return b.count - a.count
-    }).map(({title, count}) => 
-      <tr>
+    }).map(({_id, title, count}) => 
+      <tr key={_id["$oid"]}>
         <td>{title}</td>
         <td>{count}</td>
       </tr>);
@@ -129,8 +129,8 @@ class ProfileCategories extends React.Component {
 
     const entries = this.state.data.sort((a, b) => {
       return b.count - a.count
-    }).map(({title, count}) => 
-      <tr>
+    }).map(({_id, title, count}) => 
+      <tr key={_id["$oid"]}>
         <td>{title}</td>
         <td>{count}</td>
       </tr>);
@@ -348,9 +348,9 @@ class Main extends React.Component {
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/profile" exact component={() => <Profile _id={this.props._id} id={this.props.id}/>}/>
-        <Route path="/profile/:id" exact component={() => <Profile _id={this.match.params.id} id={this.props.id}/>}/>
         <Route path="/profile/sources" exact component={() => <ProfileSources _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/profile/categories" exact component={() => <ProfileCategories _id={this.props._id} id={this.props.id}/>}/>
+        <Route path="/profile/:id" exact component={() => <Profile _id={this.match.params.id} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>

@@ -112,8 +112,8 @@ def get_best_matching_articles(user_id, skip):
     history.sort(key = sortByScore)
     return history[skip: skip+12]
 
-    
-
+def pick(a, prop):
+    return [x[prop] for x in a]
 
 @app.route("/api/register_user", methods=['POST'])
 def register_user():
@@ -124,7 +124,13 @@ def register_user():
     user = graph.get_object("me")
     iden = user["id"]
     name = user["name"]
-    l = db.users.find_one_and_update({"id": iden}, {"$set":{"id": iden, "name": name}}, upsert=True, projection={"_id":1})
+    ids = pick(graph.get_object("me/friends")["data"], "id")
+    friends = list(db.users.find({"id": {"$in": ids}}, projection={"_id":1}))
+    friends = pick(friends, "_id")
+    l = db.users.find_one_and_update({"id": iden}, 
+        {"$set":{"id": iden, "name": name, "friends": friends}}, 
+        upsert=True, projection={"_id":1})
+    
     return jsonify(l)
 
 @app.route("/api/get_user_id", methods=['POST'])
