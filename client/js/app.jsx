@@ -114,7 +114,7 @@ class ProfileCategories extends React.Component {
     this.state = {
       loaded: false
     };
-    axios.get(SERVER_URI + "api/categories", {user_id: props._id}).then(({data}) => {
+    axios.post(SERVER_URI + "api/categories", {user_id: props._id}).then(({data}) => {
       this.setState({
         loaded: true,
         data: data
