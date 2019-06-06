@@ -316,16 +316,8 @@ def all_articles_source():
             }
         }, {
             "$project": {
-                "article_id": 1,
-                "time": 1,
-                "url": "$info.url",
-                "title": "$info.title",
-                "feed_id": "$info.feed_id"
-            }
-        }, {
-            "$project": {
-                "article_id": 1,
-                "time": 1,
+                "_id": 1,
+                "access_time": 1,
                 "url": {
                     "$arrayElemAt": ["$url", 0]
                 },
@@ -336,32 +328,29 @@ def all_articles_source():
                     "$arrayElemAt": ["$feed_id", 0]
                 }
             }
-        }, {
+        },  {
             "$lookup": {
                 "from": "feeds",
                 "localField": "feed_id",
                 "foreignField": "_id",
-                "as": "XXX"
+                "as": "feed_info"
             }
-        }, {
+        },  {
             "$project": {
                 "article_id": 1,
                 "time": 1,
                 "url": 1,
                 "title": 1,
-                "feed_info": {
-                    "$arrayElemAt": ["$XXX", 0]
+                "cat_id": {
+                    "$arrayElemAt": ["$feed_info.category_id",0]
+                },
+                "src_id": {
+                    "$arrayElemAt": ["$feed_info.source_id",0]
                 }
             }
         }, {
-            "$project": {
-                "article_id": 1,
-                "time": 1,
-                "url": 1,
-                "title": 1,
-                "cat_id": "$feed_info.category_id",
-                "src_id": "$feed_info.source_id"
-            }
+            "$"
+
         }])
     ))
 
@@ -429,58 +418,82 @@ def meta_sources():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
     print(user_id)
-    all_read = list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
-    return jsonify(list(db.articles.aggregate([{
-        "$match": {
-            "_id": {
-                "$in": all_read
+    return jsonify(list(
+        db.users.aggregate([{
+            "$match": {
+                "_id": user_id
             }
-        }
-    }, {
-        "$group": {
-            "_id": "$feed_id",
-            "count": {
-                "$sum": 1
+        }, {
+            "$project": {
+                "_id": 0,
+                "id": 0,
+                "name": 0,
+                "friends": 0
             }
-        }
-    }, {
-        "$lookup": {
-            "from": "feeds",
-            "localField": "_id",
-            "foreignField": "_id",
-            "as": "source_id"
-        }
-    }, {
-        "$project": {
-            "_id": 1,
-            "count": 1,
-            "source_id": {
-                "$arrayElemAt": ["$source_id.source_id", 0]
+        }, {
+            "$unwind": "$read"
+        }, {
+            "$project": {
+                "_id": "$read.article_id",
+                "access_time": "$read.time"
             }
-        }
-    }, {
-        "$group": {
-            "_id": "$source_id",
-            "count": {
-                "$sum": "$count"
+        }, {
+            "$lookup": {
+                "from": "articles",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "info"
             }
-        }
-    }, {
-        "$lookup": {
-            "from": "sources",
-            "localField": "_id",
-            "foreignField": "_id",
-            "as": "source_id"
-        }
-    }, {
-        "$project": {
-            "_id": 1,
-            "count": 1,
-            "title": {
-                "$arrayElemAt": ["$source_id.title", 0]
+        }, {
+            "$project": {
+                "_id": 1,
+                "access_time": 1,
+                "url": {
+                    "$arrayElemAt": ["$info.url", 0]
+                },
+                "title": {
+                    "$arrayElemAt": ["$info.title", 0]
+                },
+                "feed_id": {
+                    "$arrayElemAt": ["$info.feed_id", 0]
+                }
             }
-        }
-    }])))
+        },    {
+            "$lookup": {
+                "from": "feeds",
+                "localField": "feed_id",
+                "foreignField": "_id",
+                "as": "feed_info"
+            }
+        }, {
+            "$project": {
+                "src_id": {
+                    "$arrayElemAt": ["$feed_info.source_id", 0]
+                }
+            }
+        }, {
+            "$group": {
+                "_id": "$src_id",
+                "count": {
+                    "$sum": 1
+                }
+            }
+        }, {
+            "$lookup": {
+                "from": "sources",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "src_id"
+            }
+        }, {
+            "$project": {
+                "_id": 1,
+                "count": 1,
+                "title": {
+                    "$arrayElemAt": ["$src_id.title", 0]
+                }
+            }}
+        ])))
 
 if __name__ == "__main__":
    app.run(host="0.0.0.0", port=port)
