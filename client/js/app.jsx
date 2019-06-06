@@ -275,7 +275,7 @@ class Profile extends React.Component {
   toHtml(articles) {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
-        <td><a href={article.url}>{article.title}</a></td> 
+        <td><a href={article.url} onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
@@ -286,6 +286,12 @@ class Profile extends React.Component {
     return first.getFullYear() === second.getFullYear() &&
       first.getMonth() === second.getMonth() &&
       first.getDate() === second.getDate();
+  }
+
+  markAsRead(id) {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
+      console.log("sent");
+    });
   }
 }
 
