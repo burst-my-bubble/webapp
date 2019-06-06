@@ -201,6 +201,7 @@ class Profile extends React.Component {
       return { date: a[0], count: a[1] };
     });
 
+
     console.log(tMap);
 
     return <div className="container">
@@ -221,7 +222,7 @@ class Profile extends React.Component {
 />
    </div>
    <div className="col-md-3">
-     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
+     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.</div>
    </div>
    <div className="col-md-3">
      <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>

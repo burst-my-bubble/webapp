@@ -235,19 +235,127 @@ def all_articles():
     content = request.json
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
-    user = db.users.find_one({"_id": user_id})
-    if (user.get("read") is None):
-        user["read"] = []
-    all_read = user["read"]
-    t = {}
-    all_read2 = []
-    for x in all_read:
-        all_read2.append(x["article_id"])
-        t[x["article_id"]] = x["time"]
-    articles = list(db.articles.find({"_id":{"$in": all_read2}}))
-    for x in articles:
-        x["access_time"] = t[x["_id"]]
-    return jsonify(articles)
+    return jsonify(list(
+        db.users.aggregate([{
+            "$match": {
+                "_id": user_id
+            }
+        }, {
+            "$project": {
+                "_id": 0,
+                "id": 0,
+                "name": 0,
+                "friends": 0
+            }
+        }, {
+            "$unwind": "$read"
+        }, {
+            "$project": {
+                "_id": "$read.article_id",
+                "access_time": "$read.time"
+            }
+        }, {
+            "$lookup": {
+                "from": "articles",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "info"
+            }
+        }, {
+            "$project": {
+                "_id": 1,
+                "access_time": 1,
+                "url": {
+                    "$arrayElemAt": ["$info.url", 0]
+                },
+                "title": {
+                    "$arrayElemAt": ["$info.title", 0]
+                }
+            }
+        }])))
+
+@app.route("/api/all_articles_source", methods=['POST'])
+def all_articles_source():
+    content = request.json
+    print(content)
+    user_id = ObjectId(content["user_id"]["$oid"])
+    return jsonify(list(
+        db.users.aggregate([{
+            "$match": {
+                "_id": ObjectId("5cf11df67a920120fa46c01b")
+            }
+        }, {
+            "$project": {
+                "_id": 0,
+                "id": 0,
+                "name": 0,
+                "friends": 0
+            }
+        }, {
+            "$unwind": "$read"
+        }, {
+            "$project": {
+                "article_id": "$read.article_id",
+                "time": "$read.time"
+            }
+        }, {
+            "$lookup": {
+                "from": "articles",
+                "localField": "article_id",
+                "foreignField": "_id",
+                "as": "info"
+            }
+        }, {
+            "$project": {
+                "article_id": 1,
+                "time": 1,
+                "url": "$info.url",
+                "title": "$info.title",
+                "feed_id": "$info.feed_id"
+            }
+        }, {
+            "$project": {
+                "article_id": 1,
+                "time": 1,
+                "url": {
+                    "$arrayElemAt": ["$url", 0]
+                },
+                "title": {
+                    "$arrayElemAt": ["$title", 0]
+                },
+                "feed_id": {
+                    "$arrayElemAt": ["$feed_id", 0]
+                }
+            }
+        }, {
+            "$lookup": {
+                "from": "feeds",
+                "localField": "feed_id",
+                "foreignField": "_id",
+                "as": "XXX"
+            }
+        }, {
+            "$project": {
+                "article_id": 1,
+                "time": 1,
+                "url": 1,
+                "title": 1,
+                "feed_info": {
+                    "$arrayElemAt": ["$XXX", 0]
+                }
+            }
+        }, {
+            "$project": {
+                "article_id": 1,
+                "time": 1,
+                "url": 1,
+                "title": 1,
+                "cat_id": "$feed_info.category_id",
+                "src_id": "$feed_info.source_id"
+            }
+        }])
+    ))
+
 
 @app.route("/api/categories", methods=['POST'])
 def meta_categories():
