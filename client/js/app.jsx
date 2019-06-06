@@ -187,15 +187,12 @@ class Profile extends React.Component {
     axios.post(SERVER_URI + "api/all_articles_sources_cats", {user_id: props._id}).then(({data}) => {
       console.log("helloao");
       axios.post(SERVER_URI + "api/get_name", {user_id: props._id}).then((a) => {
-        axios.post(SERVER_URI + "api/sources", {user_id: props._id}).then((b) => {
           console.log("tester");
           this.setState({
             loaded: true,
             data: data,
-            data2: a.data,
-            data3: b.data
+            data2: a.data
           });
-        });  
       });
     });
   }
@@ -244,7 +241,7 @@ class Profile extends React.Component {
 
     console.log(tMap);
 
-    const data = this.state.data3.map(({title, count}) => {
+    const data = this.state.data.sources.map(({title, count}) => {
       return {name: title, value: count};
     });
     return <div className="container">
