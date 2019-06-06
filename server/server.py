@@ -325,7 +325,7 @@ def all_articles_source_cats():
                     "$arrayElemAt": ["$info.title", 0]
                 },
                 "feed_id": {
-                    "$arrayElemAt": ["$feed_id", 0]
+                    "$arrayElemAt": ["$info.feed_id", 0]
                 }
             }
         },  {
