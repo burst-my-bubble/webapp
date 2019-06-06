@@ -317,10 +317,10 @@ class Profile extends React.Component {
        <div className="col-md-12">
        <div className="small-nav">
      <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <a href="/" className="nav-link active">Summary</a>
-          <a href="/categories" className="nav-link">Categories</a>
-          <a href="/categories" className="nav-link">Sources</a>
-          <a href="/archive" className="nav-link">Archive</a>
+          <a href={"/user/" + this.props._id["$oid"]} className="nav-link active">Summary</a>
+          <a href={"/user/" + this.props._id["$oid"] + "/categories"} className="nav-link">Categories</a>
+          <a href={"/user/" + this.props._id["$oid"] + "/sources"} className="nav-link">Sources</a>
+          <a href={"/user/" + this.props._id["$oid"] + "/archive"} className="nav-link">Archive</a>
         </div>
      </div>
      <br/>
