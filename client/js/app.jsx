@@ -215,7 +215,7 @@ class Profile extends React.Component {
  <div className="row">
    <div className="col-md-3">
      <div className="sidebar stat">
-        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.props.id + "/picture?width=900"}/>
+        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data2.id + "/picture?width=900"}/>
         <br/><br/>
         <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
         <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
