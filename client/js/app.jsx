@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import CalendarHeatmap from 'react-calendar-heatmap';
-import { PieChart, Pie, Cell } from "recharts";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 class Login extends React.Component {
   render() {
@@ -274,6 +274,13 @@ class Profile extends React.Component {
 
     console.log(tMap);
 
+    const data = this.state.data.sources.map(({title, count}) => {
+      return {name: title, value: count};
+    });
+
+    const data2 = this.state.data.categories.map(({title, count}) => {
+      return {name: title, value: count};
+    });
 
     return <div className="container">
 <br/>
@@ -310,7 +317,7 @@ class Profile extends React.Component {
           <a href="/" className="nav-link active">Summary</a>
           <a href="/categories" className="nav-link">Categories</a>
           <a href="/categories" className="nav-link">Sources</a>
-          <a className="nav-link">Settings</a>
+          <a href="/archive" className="nav-link">Archive</a>
         </div>
      </div>
      <br/>
@@ -320,10 +327,30 @@ class Profile extends React.Component {
      <div className="card stat"><h1>5</h1> day streak.</div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.</div>
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.
+     <PieChart width={200} height={200}>
+        <Pie dataKey="value"  isAnimationActive={false} data={data2} cx={100} cy={100} outerRadius={80} fill="#8884d8">
+        {
+            data2.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+          }
+        </Pie>
+        <Tooltip />
+      </PieChart>
+     </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
+   <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.
+     
+     <PieChart width={200} height={200}>
+        <Pie dataKey="value"  isAnimationActive={false} data={data} cx={100} cy={100} outerRadius={80} fill="#8884d8">
+        {
+            data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+          }
+        </Pie>
+        <Tooltip />
+      </PieChart>
+     </div>
+
    </div>
    </div>
   
