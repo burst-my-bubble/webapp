@@ -164,7 +164,6 @@ class Profile extends React.Component {
         });
       });
     });
-
   }
   render() {
     if (!this.state.loaded) {
@@ -208,6 +207,7 @@ class Profile extends React.Component {
       return { date: a[0], count: a[1] };
     });
 
+
     console.log(tMap);
 
     return <div className="container">
@@ -215,7 +215,7 @@ class Profile extends React.Component {
  <div className="row">
    <div className="col-md-3">
      <div className="sidebar stat">
-        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.props.id + "/picture?width=900"}/>
+        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data2.id + "/picture?width=900"}/>
         <br/><br/>
         <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
         <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
@@ -244,7 +244,7 @@ class Profile extends React.Component {
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>5</Link></h1> day streak.</div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.</div>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
@@ -413,7 +413,7 @@ class Settings extends React.Component {
       <div className="list-group">
         {categories}
       </div>
-      <button>Save</button>
+      <button style={{marginTop: "10px"}} className="btn btn-primary">Save</button>
     </div>;
   }
 }
@@ -458,10 +458,10 @@ class Friends extends React.Component {
 
     console.log(this.state.data);
     const people = this.state.data.map(({_id, id, name}) => {
-      return <div className="card col-md-3" key={id}>
+      return <div className="col-md-3" key={id}><div className="card"><div className="card-body">
         <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
-        <h4>{name}</h4>
-      </div>
+        <h4>{name}</h4></div>
+      </div></div>
     });
 
     return <div className="container">
@@ -533,7 +533,7 @@ class Home extends React.Component {
     const articles = !this.state.loaded ? [] : this.state.data.map((article) => { 
       const id = article._id["$oid"];
       const tags = article.entities.map(e => {
-        return <span key={e.displayName} className="badge badge-secondary">{e.displayName}</span>;
+        return <span key={e.displayName} className="label badge badge-secondary">{e.displayName}</span>;
       });
       return <div className="col-md-3" key={id}>
         <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
