@@ -8,8 +8,36 @@ import { PieChart, Pie, Cell } from "recharts";
 class Login extends React.Component {
   render() {
     return (
-      <div className="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="true" data-scope="user_friends" data-onlogin="login()"></div>
-    );
+      <div className="login-container"xs>
+
+        <div className="title login-title">BURST MY BUBBLE</div>
+        <div className="login-text">
+          <h1>Want to expand your horizons?</h1>
+          <p> Well then you've come to the right place!
+            <br></br>Here at Burst My Bubble, our aim is to do just that, by showing you news from sources you don't usually visit.
+            <br></br> We use advanced machine learning in order to curate personalised news feeds on topics you are genuinely interested in, 
+            but from a different perspective.
+            <br></br> The site learns as you use it, so the recommendation will keep getting more accurate over time.
+            <br></br> It's easy to sign up, just log in with Facebook and we do the rest! </p>
+            
+            <div className="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="true" data-scope="user_friends" data-onlogin="login()"></div>
+        </div>
+
+        <div id="background-wrap">
+          <div className="bubble x1"></div>
+          <div className="bubble x2"></div>
+          <div className="bubble x3"></div>
+          <div className="bubble x4"></div>
+          <div className="bubble x5"></div>
+          <div className="bubble x6"></div>
+          <div className="bubble x7"></div>
+          <div className="bubble x8"></div>
+          <div className="bubble x9"></div>
+          <div className="bubble x10"></div>
+        </div>
+
+      </div>
+      );
   }
 
   componentDidMount() {
