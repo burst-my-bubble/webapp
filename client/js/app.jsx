@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import CalendarHeatmap from 'react-calendar-heatmap';
-
+import { PieChart, Pie, Cell } from "recharts";
 
 class Login extends React.Component {
   render() {
@@ -37,6 +37,10 @@ class App extends React.Component {
     this.state = {
       loaded: false
     };
+    
+  }
+
+  componentDidMount() {
     FB.getLoginStatus((response) => {
       if (response.status === "not_authorized" || response.status === "unknown") {
         this.setState({loaded: true, id: ""});
@@ -71,6 +75,26 @@ class App extends React.Component {
   }
 }
 
+const data01 = [
+  { name: 'Group A', value: 400 }, { name: 'Group B', value: 300 },
+  { name: 'Group C', value: 300 }, { name: 'Group D', value: 200 },
+  { name: 'Group E', value: 278 }, { name: 'Group F', value: 189 },
+];
+
+const RADIAN = Math.PI / 180;
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+const customLabel = (props) => {
+  console.log("hi", props);
+    const radius = props.outerRadius;
+    const x = props.cx + radius * Math.cos(-props.midAngle * RADIAN);
+    const y = props.cy + radius * Math.sin(-props.midAngle * RADIAN);
+    return <text x={props.x} y={props.y} textAnchor={x > props.cx ? 'start' : 'end'} dominantBaseline="central">
+    {props.name}
+  </text>;
+}
+
 class ProfileSources extends React.Component {
   constructor(props) {
     super();
@@ -98,6 +122,10 @@ class ProfileSources extends React.Component {
         <td>{count}</td>
       </tr>);
 
+    const data = this.state.data.map(({title, count}) => {
+      return {name: title, value: count};
+    });
+
     return <div className="container">
       <br/>
       <table className="table table-bordered">
@@ -105,6 +133,14 @@ class ProfileSources extends React.Component {
           {entries}
         </tbody>
       </table>
+      <br/>
+      <PieChart width={400} height={400}>
+        <Pie dataKey="value" label={customLabel} isAnimationActive={false} data={data} cx={200} cy={200} outerRadius={80} fill="#8884d8">
+        {
+            data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+          }
+        </Pie>
+      </PieChart>
     </div>
   }
 }
@@ -239,9 +275,20 @@ class Profile extends React.Component {
    </div>
    <div className="col-md-9">
      <div className="row">
-
+       <div className="col-md-12">
+       <div className="small-nav">
+     <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <a href="/" className="nav-link active">Summary</a>
+          <a href="/categories" className="nav-link">Categories</a>
+          <a href="/categories" className="nav-link">Sources</a>
+          <a className="nav-link">Settings</a>
+        </div>
+     </div>
+     <br/>
+       </div>
+     
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>5</Link></h1> day streak.</div>
+     <div className="card stat"><h1>5</h1> day streak.</div>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.</div>
@@ -275,7 +322,7 @@ class Profile extends React.Component {
   toHtml(articles) {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
-        <td><a href={article.url}>{article.title}</a></td> 
+        <td><a href={article.url} target="_blank" onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
@@ -286,6 +333,12 @@ class Profile extends React.Component {
     return first.getFullYear() === second.getFullYear() &&
       first.getMonth() === second.getMonth() &&
       first.getDate() === second.getDate();
+  }
+
+  markAsRead(id) {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props.myid, article_id: id}).then(() => {
+      console.log("sent");
+    });
   }
 }
 
@@ -420,7 +473,7 @@ class Main extends React.Component {
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  id={this.props.id}/>}/>
         <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
-        <Route path="/user/:id" exact component={({match}) => <Profile _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
+        <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
@@ -452,10 +505,10 @@ class Friends extends React.Component {
 
     console.log(this.state.data);
     const people = this.state.data.map(({_id, id, name}) => {
-      return <div className="col-md-3" key={id}><div className="card"><div className="card-body">
+      return <div className="col-md-3" key={id}><div className="card article"><div className="card-body">
         <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
-        <h4>{name}</h4></div>
-      </div></div>
+        <h4>{name}</h4>
+      </div></div></div>
     });
 
     return <div className="container">
