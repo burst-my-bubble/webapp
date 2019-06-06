@@ -28,7 +28,8 @@
     "react": "^16.8.6",
     "react-calendar-heatmap": "^1.8.0",
     "react-dom": "^16.8.6",
-    "react-router-dom": "^5.0.0"
+    "react-router-dom": "^5.0.0",
+    "recharts": "^1.6.2"
   },
   "jest": {
     "testMatch": [
