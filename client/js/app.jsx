@@ -37,6 +37,10 @@ class App extends React.Component {
     this.state = {
       loaded: false
     };
+    
+  }
+
+  componentDidMount() {
     FB.getLoginStatus((response) => {
       if (response.status === "not_authorized" || response.status === "unknown") {
         this.setState({loaded: true, id: ""});
