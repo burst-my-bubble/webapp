@@ -353,7 +353,8 @@ class Navbar extends React.Component {
     super();
     this.state = {
       loaded: false,
-      dropdown: ""
+      dropdown: "",
+      mobileDropdown: "collapse"
     };
     this.eventHandler = this.handleClick.bind(this); 
     axios.get(SERVER_URI + "api/categories").then(({data}) => {
@@ -385,6 +386,12 @@ class Navbar extends React.Component {
     });
   }
 
+  mobileToggle() {
+    this.setState({
+      mobileDropdown: this.state.mobileDropdown === "" ? "collapse": ""
+    });
+  }
+
   render() {
     if (!this.state.loaded) {
       return null;
@@ -403,7 +410,10 @@ class Navbar extends React.Component {
           </Link>
         </li>
       </ul>
-      <div className="collapse navbar-collapse">
+      <button className="navbar-toggler" onClick={this.mobileToggle.bind(this)} type="button">
+    <span className="navbar-toggler-icon"></span>
+  </button> 
+      <div className={"navbar-collapse " + this.state.mobileDropdown}>
       <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
        {categories}
       </ul>
@@ -419,7 +429,8 @@ class Navbar extends React.Component {
           </div>
         </li>
       </ul>
-      </div>    
+      </div>   
+     
     </nav>;
   }
 }
