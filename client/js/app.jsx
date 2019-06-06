@@ -216,19 +216,45 @@ class Profile extends React.Component {
     super();
     this.state = {
       loaded: false
-    };
-    axios.post(SERVER_URI + "api/all_articles_sources_cats", {user_id: props._id}).then(({data}) => {
+    }; 
+  }
+
+  static getDerivedStateFromProps(nextProps, nextState) {
+    if (nextProps._id !== nextState.id) {
+      return Object.assign({}, nextState, {
+        id: nextProps._id
+      });
+    }
+    return null;
+  }
+
+  componentDidMount() {
+    this.loadData();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!this.state.loaded || this.state.loadedId !== this.state.id) {
+      this.loadData();
+    }
+  }
+
+  loadData() {
+    var id = this.state.id;
+    axios.post(SERVER_URI + "api/all_articles_sources_cats", {user_id: id}).then(({data}) => {
       console.log("helloao");
-      axios.post(SERVER_URI + "api/get_name", {user_id: props._id}).then((a) => {
+      axios.post(SERVER_URI + "api/get_name", {user_id: id}).then((a) => {
         console.log("tester");
         this.setState({
           loaded: true,
           data: data,
-          data2: a.data
+          data2: a.data,
+          loadedId: id,
+          id: id
         });
       });
     });
   }
+
   render() {
     if (!this.state.loaded) {
       return null;
