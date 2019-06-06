@@ -23,6 +23,9 @@ deploy:
     - docker cp temp:static /var/www/html/
     - docker rm temp
     - docker image prune
+  environment:
+    name: staging
+    url: https://webapps18.hashanp.xyz
 
 build_server:
   stage: build

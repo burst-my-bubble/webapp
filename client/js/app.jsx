@@ -165,7 +165,7 @@ class ProfileSources extends React.Component {
       <PieChart width={400} height={400}>
         <Pie dataKey="value" label={customLabel} isAnimationActive={false} data={data} cx={200} cy={200} outerRadius={80} fill="#8884d8">
         {
-            data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+            data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />)
           }
         </Pie>
       </PieChart>
