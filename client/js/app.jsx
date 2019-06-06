@@ -417,7 +417,9 @@ class Navbar extends React.Component {
       <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
        {categories}
       </ul>
-      <ul className="navbar-nav">
+      </div>   
+     <div className="d-none d-lg-block">
+     <ul className="navbar-nav">
         <li className="nav-item">
           <img className="profile" onClick={this.toggle.bind(this)} src={"https://graph.facebook.com/" + this.props.id + "/picture?type=normal"}/>
           <div className={"dropdown-menu dropdown-menu-right " + this.state.dropdown}>
@@ -429,8 +431,7 @@ class Navbar extends React.Component {
           </div>
         </li>
       </ul>
-      </div>   
-     
+      </div>
     </nav>;
   }
 }
