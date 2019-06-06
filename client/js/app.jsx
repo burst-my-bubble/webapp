@@ -155,9 +155,13 @@ class Profile extends React.Component {
     };
     axios.post(SERVER_URI + "api/all_articles", {user_id: props._id}).then(({data}) => {
       console.log("helloao");
-      this.setState({
-        loaded: true,
-        data: data
+      axios.post(SERVER_URI + "api/get_name", {user_id: props._id}).then((a) => {
+        console.log("tester");
+        this.setState({
+          loaded: true,
+          data: data,
+          data2: a.data
+        });
       });
     });
   }
@@ -178,6 +182,8 @@ class Profile extends React.Component {
     var today = lastWeek.filter(a => this.sameDay(a.access_time, TODAY));
     var notTodayButLastWeek = lastWeek.filter(a => !this.sameDay(a.access_time, TODAY));
     var lastMonth = articles.filter(a => this.daysBetween(a.access_time, TODAY) > 7);
+
+    var joinDate = new Date(this.state.data2["joined"].$date);
 
     var map = {};
     articles.forEach(a => {
@@ -208,7 +214,15 @@ class Profile extends React.Component {
 <br/>
  <div className="row">
    <div className="col-md-3">
-   <CalendarHeatmap
+     <div className="sidebar stat">
+        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data2.id + "/picture?width=900"}/>
+        <br/><br/>
+        <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
+        <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
+     </div>
+     <br/>
+     <div className="stat">
+     <CalendarHeatmap
   startDate={TODAY_365}
   endDate={TODAY}
   values={tMap}
@@ -220,26 +234,38 @@ class Profile extends React.Component {
     return `color-scale-${value.count}`;
   }}
 />
+     </div>
+     
    </div>
-   <div className="col-md-3">
-     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.</div>
-   </div>
-   <div className="col-md-3">
-     <div className="card"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
-   </div>
-   <div className="col-md-3">
+   <div className="col-md-9">
+     <div className="row">
 
+   <div className="col-md-4">
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>5</Link></h1> day streak.</div>
    </div>
- </div>
+   <div className="col-md-4">
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
+   </div>
+   <div className="col-md-4">
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
+   </div>
+   </div>
+  
       
 <br/>
-        <h4>Today</h4>
+  <div className="stat">
+  <h4>Today</h4>
         {this.toHtml(today)}
         <h4>Last Week</h4>
         {this.toHtml(notTodayButLastWeek)}
         <h4>Last Month</h4>
         {this.toHtml(lastMonth)}
-    </div>;
+  </div>
+        
+    </div>
+    </div>
+
+</div>;
   }
 
   daysBetween(first, second) {
@@ -250,7 +276,6 @@ class Profile extends React.Component {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
         <td><a href={article.url}>{article.title}</a></td> 
-        <td>{article.access_time.toString()}</td>
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
@@ -382,7 +407,7 @@ class Settings extends React.Component {
       <div className="list-group">
         {categories}
       </div>
-      <button>Save</button>
+      <button style={{marginTop: "10px"}} className="btn btn-primary">Save</button>
     </div>;
   }
 }
@@ -427,10 +452,10 @@ class Friends extends React.Component {
 
     console.log(this.state.data);
     const people = this.state.data.map(({_id, id, name}) => {
-      return <div className="card col-md-3" key={id}>
+      return <div className="col-md-3" key={id}><div className="card"><div className="card-body">
         <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
-        <h4>{name}</h4>
-      </div>
+        <h4>{name}</h4></div>
+      </div></div>
     });
 
     return <div className="container">
@@ -502,7 +527,7 @@ class Home extends React.Component {
     const articles = !this.state.loaded ? [] : this.state.data.map((article) => { 
       const id = article._id["$oid"];
       const tags = article.entities.map(e => {
-        return <span key={e.displayName} className="badge badge-secondary">{e.displayName}</span>;
+        return <span key={e.displayName} className="label badge badge-secondary">{e.displayName}</span>;
       });
       return <div className="col-md-3" key={id}>
         <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
@@ -529,7 +554,7 @@ class Home extends React.Component {
           <div className="row">
 
             <div className="col-md-4">{previousPage}</div>
-            <div className="col-md-4" style={{paddingTop:"30px"}}><h1 className="text-center ikaros">Front Page</h1></div>
+            <div className="col-md-4" style={{paddingTop:"30px"}}><h1 className="text-center ikaros">{this.getTitle(this.state.url)}</h1></div>
             <div className="col-md-4">
               <button className="btn btn-secondary float-right" style={{marginTop:"30px"}} onClick={this.nextPage.bind(this)}>Next Page</button>
             </div>
@@ -547,7 +572,7 @@ class Home extends React.Component {
     });
   }
 
-  getColour(sentiment){
+  getColour(sentiment) { 
     if(sentiment < 0.2){
       return "rgb(255, 0, 0)";
     } else if (sentiment < 0.4) {
@@ -559,6 +584,17 @@ class Home extends React.Component {
     }
     return "rgb(1, 255, 0)";
   }
+
+  getTitle(url) {
+    if (url == "") {
+      return "Your Feed";
+    } else {
+      var key = url.substr(1)
+      return key.charAt(0).toUpperCase() + key.slice(1) + " Feed";
+    }
+  }
+
+
 }
 
 window.ready = () => {

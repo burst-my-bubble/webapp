@@ -32,6 +32,7 @@ def jsonify(obj):
     content = json.dumps(obj, default=json_util.default)
     return Response(content, 200, mimetype="application/json")
 
+
 def get_new_mean(avg, new_value, total):
     return (avg * total + new_value) / (total + 1)
 
@@ -136,6 +137,13 @@ def get_best_matching_articles(user_id, skip, category_id):
 def pick(a, prop):
     return [x[prop] for x in a]
 
+@app.route("/api/get_name", methods=['POST'])
+def get_name():
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    print(user_id)
+    return jsonify(db.users.find_one({"_id": user_id}))
+
 @app.route("/api/register_user", methods=['POST'])
 def register_user():
     content = request.json
@@ -149,7 +157,8 @@ def register_user():
     friends = list(db.users.find({"id": {"$in": ids}}, projection={"_id":1}))
     friends = pick(friends, "_id")
     l = db.users.find_one_and_update({"id": iden}, 
-        {"$set":{"id": iden, "name": name, "friends": friends}}, 
+        {"$set":{"id": iden, "name": name, "friends": friends}, 
+         "$setOnInsert":{"joined": datetime.now()}},
         upsert=True, projection={"_id":1})
     
     return jsonify(l)
