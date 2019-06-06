@@ -111,7 +111,7 @@ const data01 = [
 
 const RADIAN = Math.PI / 180;
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLOURS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', "#ff5454", "#8f5bd1"];
 
 const customLabel = (props) => {
   console.log("hi", props);
@@ -334,7 +334,7 @@ class Profile extends React.Component {
      <PieChart width={200} height={200}>
         <Pie dataKey="value"  isAnimationActive={false} data={data2} cx={100} cy={100} outerRadius={80} fill="#8884d8">
         {
-            data2.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+            data2.map((entry, index) => <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />)
           }
         </Pie>
         <Tooltip />
@@ -347,7 +347,7 @@ class Profile extends React.Component {
      <PieChart width={200} height={200}>
         <Pie dataKey="value"  isAnimationActive={false} data={data} cx={100} cy={100} outerRadius={80} fill="#8884d8">
         {
-            data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+            data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />)
           }
         </Pie>
         <Tooltip />
