@@ -402,7 +402,10 @@ class Navbar extends React.Component {
             BURST MY BUBBLE
           </Link>
         </li>
-        {categories}
+      </ul>
+      <div className="collapse navbar-collapse">
+      <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+       {categories}
       </ul>
       <ul className="navbar-nav">
         <li className="nav-item">
@@ -416,6 +419,7 @@ class Navbar extends React.Component {
           </div>
         </li>
       </ul>
+      </div>    
     </nav>;
   }
 }
