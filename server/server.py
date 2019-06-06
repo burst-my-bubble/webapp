@@ -349,7 +349,6 @@ def all_articles_source():
                 }
             }
         }, {
-            "$"
 
         }])
     ))
@@ -359,41 +358,64 @@ def all_articles_source():
 def meta_categories():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
-    print(user_id)
-    all_read = list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
-
-    return jsonify(list(db.articles.aggregate([{
-        "$match": {
-            "_id": {
-                "$in": all_read
+    return jsonify(list(
+        db.users.aggregate([{
+            "$match": {
+                "_id": user_id
             }
-        } }, {
-            "$group": {
-                "_id": "$feed_id",
-                "count": {
-                    "$sum": 1
-                }
+        }, {
+            "$project": {
+                "_id": 0,
+                "id": 0,
+                "name": 0,
+                "friends": 0
+            }
+        }, {
+            "$unwind": "$read"
+        }, {
+            "$project": {
+                "_id": "$read.article_id",
+                "access_time": "$read.time"
             }
         }, {
             "$lookup": {
-                "from": "feeds",
+                "from": "articles",
                 "localField": "_id",
                 "foreignField": "_id",
-                "as": "category_id"
+                "as": "info"
             }
         }, {
             "$project": {
                 "_id": 1,
-                "count": 1,
-                "category_id": {
-                    "$arrayElemAt": ["$category_id.category_id", 0]
+                "access_time": 1,
+                "url": {
+                    "$arrayElemAt": ["$info.url", 0]
+                },
+                "title": {
+                    "$arrayElemAt": ["$info.title", 0]
+                },
+                "feed_id": {
+                    "$arrayElemAt": ["$info.feed_id", 0]
+                }
+            }
+        },    {
+            "$lookup": {
+                "from": "feeds",
+                "localField": "feed_id",
+                "foreignField": "_id",
+                "as": "feed_info"
+            }
+        }, {
+            "$project": {
+                "cat_id": {
+                    "$arrayElemAt": ["$feed_info.category_id", 0]
                 }
             }
         }, {
             "$group": {
-                "_id": "$category_id",
+                "_id": "$cat_id",
                 "count": {
-                    "$sum": "$count"
+                    "$sum": 1
                 }
             }
         }, {
@@ -418,6 +440,7 @@ def meta_sources():
     content = request.json
     user_id = ObjectId(content["user_id"]["$oid"])
     print(user_id)
+    all_read = list(map(lambda x: x["article_id"], db.users.find_one({"_id": user_id})["read"]))
     return jsonify(list(
         db.users.aggregate([{
             "$match": {
