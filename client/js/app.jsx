@@ -275,7 +275,7 @@ class Profile extends React.Component {
   toHtml(articles) {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
-        <td><a href={article.url} onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
+        <td><a href={article.url} target="_blank" onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
@@ -426,7 +426,7 @@ class Main extends React.Component {
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  id={this.props.id}/>}/>
         <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
-        <Route path="/user/:id" exact component={({match}) => <Profile _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
+        <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
@@ -573,7 +573,7 @@ class Home extends React.Component {
   }
 
   markAsRead(id) {
-    axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props.myid, article_id: id}).then(() => {
       console.log("sent");
     });
   }
