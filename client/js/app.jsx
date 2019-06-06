@@ -239,6 +239,7 @@ class Profile extends React.Component {
       return { date: a[0], count: a[1] };
     });
 
+
     console.log(tMap);
 
     return <div className="container">
@@ -286,7 +287,7 @@ class Profile extends React.Component {
      <div className="card stat"><h1>5</h1> day streak.</div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>75</Link></h1> articles read this week. Technology being your favourite category.</div>
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.</div>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.</div>
@@ -317,7 +318,7 @@ class Profile extends React.Component {
   toHtml(articles) {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
-        <td><a href={article.url}>{article.title}</a></td> 
+        <td><a href={article.url} target="_blank" onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
@@ -328,6 +329,12 @@ class Profile extends React.Component {
     return first.getFullYear() === second.getFullYear() &&
       first.getMonth() === second.getMonth() &&
       first.getDate() === second.getDate();
+  }
+
+  markAsRead(id) {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props.myid, article_id: id}).then(() => {
+      console.log("sent");
+    });
   }
 }
 
@@ -462,7 +469,7 @@ class Main extends React.Component {
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  id={this.props.id}/>}/>
         <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
-        <Route path="/user/:id" exact component={({match}) => <Profile _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
+        <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
