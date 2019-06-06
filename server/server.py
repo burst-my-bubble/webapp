@@ -283,15 +283,15 @@ def all_articles():
             }
         }])))
 
-@app.route("/api/all_articles_source", methods=['POST'])
-def all_articles_source():
+@app.route("/api/all_articles_sources_cats", methods=['POST'])
+def all_articles_source_cats():
     content = request.json
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
     return jsonify(list(
         db.users.aggregate([{
             "$match": {
-                "_id": ObjectId("5cf11df67a920120fa46c01b")
+                "_id": user_id 
             }
         }, {
             "$project": {
@@ -304,13 +304,13 @@ def all_articles_source():
             "$unwind": "$read"
         }, {
             "$project": {
-                "article_id": "$read.article_id",
-                "time": "$read.time"
+                "_id": "$read.article_id",
+                "access_time": "$read.time"
             }
         }, {
             "$lookup": {
                 "from": "articles",
-                "localField": "article_id",
+                "localField": "_id",
                 "foreignField": "_id",
                 "as": "info"
             }
@@ -319,40 +319,94 @@ def all_articles_source():
                 "_id": 1,
                 "access_time": 1,
                 "url": {
-                    "$arrayElemAt": ["$url", 0]
+                    "$arrayElemAt": ["$info.url", 0]
                 },
                 "title": {
-                    "$arrayElemAt": ["$title", 0]
+                    "$arrayElemAt": ["$info.title", 0]
                 },
                 "feed_id": {
                     "$arrayElemAt": ["$feed_id", 0]
                 }
             }
         },  {
-            "$lookup": {
-                "from": "feeds",
-                "localField": "feed_id",
-                "foreignField": "_id",
-                "as": "feed_info"
-            }
-        },  {
-            "$project": {
-                "article_id": 1,
-                "time": 1,
-                "url": 1,
-                "title": 1,
-                "cat_id": {
-                    "$arrayElemAt": ["$feed_info.category_id",0]
-                },
-                "src_id": {
-                    "$arrayElemAt": ["$feed_info.source_id",0]
-                }
-            }
-        }, {
-
-        }])
-    ))
-
+            "$facet": {
+                "history": [{"$project": {"_id": 1, "access_time": 1, "url": 1, "title": 1}}],
+                "categories": [
+                    {
+                        "$lookup": {
+                            "from": "feeds",
+                            "localField": "feed_id",
+                            "foreignField": "_id",
+                            "as": "feed_info"
+                        }
+                    },  {
+                        "$project": {
+                            "cat_id": {
+                                "$arrayElemAt": ["$feed_info.category_id", 0]
+                            }
+                        }
+                    }, {
+                        "$group": {
+                            "_id": "$cat_id",
+                            "count": {
+                                "$sum": 1
+                            }
+                        }
+                    }, {
+                        "$lookup": {
+                            "from": "categories",
+                            "localField": "_id",
+                            "foreignField": "_id",
+                            "as": "category_id"
+                        }
+                    }, {
+                        "$project": {
+                            "_id": 1,
+                            "count": 1,
+                            "title": {
+                                "$arrayElemAt": ["$category_id.title", 0]
+                            }
+                        }
+                    }
+                ],
+                "sources": [
+                    {
+                        "$lookup": {
+                            "from": "feeds",
+                            "localField": "feed_id",
+                            "foreignField": "_id",
+                            "as": "feed_info"
+                        }
+                    }, {
+                        "$project": {
+                            "src_id": {
+                                "$arrayElemAt": ["$feed_info.source_id", 0]
+                            }
+                        }
+                    }, {
+                        "$group": {
+                            "_id": "$src_id",
+                            "count": {
+                                "$sum": 1
+                            }
+                        }
+                    }, {
+                        "$lookup": {
+                            "from": "sources",
+                            "localField": "_id",
+                            "foreignField": "_id",
+                            "as": "src_id"
+                        }
+                    }, {
+                        "$project": {
+                            "_id": 1,
+                            "count": 1,
+                            "title": {
+                                "$arrayElemAt": ["$src_id.title", 0]
+                            }
+                        }}
+                ]}}]))[0])
+            
 
 @app.route("/api/categories", methods=['POST'])
 def meta_categories():

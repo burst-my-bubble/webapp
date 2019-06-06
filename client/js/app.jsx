@@ -189,7 +189,7 @@ class Profile extends React.Component {
     this.state = {
       loaded: false
     };
-    axios.post(SERVER_URI + "api/all_articles", {user_id: props._id}).then(({data}) => {
+    axios.post(SERVER_URI + "api/all_articles_sources_cats", {user_id: props._id}).then(({data}) => {
       console.log("helloao");
       axios.post(SERVER_URI + "api/get_name", {user_id: props._id}).then((a) => {
         console.log("tester");
@@ -206,7 +206,7 @@ class Profile extends React.Component {
       return null;
     }
     console.log(this.state.data);
-    var articles = this.state.data.sort((a, b) => 
+    var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
     ).map(a => Object.assign({}, a, {access_time: new Date(a.access_time["$date"])}));
     
