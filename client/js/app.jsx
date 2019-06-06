@@ -289,7 +289,7 @@ class Profile extends React.Component {
   }
 
   markAsRead(id) {
-    axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props.myid, article_id: id}).then(() => {
       console.log("sent");
     });
   }
@@ -573,7 +573,7 @@ class Home extends React.Component {
   }
 
   markAsRead(id) {
-    axios.post(SERVER_URI + "api/read", {user_id: this.props.myid, article_id: id}).then(() => {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
       console.log("sent");
     });
   }
