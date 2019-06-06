@@ -164,7 +164,6 @@ class Profile extends React.Component {
         });
       });
     });
-
   }
   render() {
     if (!this.state.loaded) {
@@ -407,7 +406,7 @@ class Settings extends React.Component {
       <div className="list-group">
         {categories}
       </div>
-      <button>Save</button>
+      <button style={{marginTop: "10px"}} className="btn btn-primary">Save</button>
     </div>;
   }
 }
