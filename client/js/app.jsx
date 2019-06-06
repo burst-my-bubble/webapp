@@ -451,10 +451,10 @@ class Friends extends React.Component {
 
     console.log(this.state.data);
     const people = this.state.data.map(({_id, id, name}) => {
-      return <div className="card col-md-3" key={id}>
+      return <div className="col-md-3" key={id}><div className="card"><div className="card-body">
         <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
-        <h4>{name}</h4>
-      </div>
+        <h4>{name}</h4></div>
+      </div></div>
     });
 
     return <div className="container">
