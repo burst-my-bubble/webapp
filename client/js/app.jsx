@@ -278,6 +278,9 @@ class Profile extends React.Component {
       return {name: title, value: count};
     });
 
+    const topSource = this.state.data.sources.sort((a, b) => b.count - a.count)[0].title;
+    const topCategory = this.state.data.categories.sort((a, b) => b.count - a.count)[0].title;
+
     const data2 = this.state.data.categories.map(({title, count}) => {
       return {name: title, value: count};
     });
@@ -327,7 +330,7 @@ class Profile extends React.Component {
      <div className="card stat"><h1>5</h1> day streak.</div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. Technology being your favourite category.
+     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. {topCategory} being your favourite category.
      <PieChart width={200} height={200}>
         <Pie dataKey="value"  isAnimationActive={false} data={data2} cx={100} cy={100} outerRadius={80} fill="#8884d8">
         {
@@ -339,7 +342,7 @@ class Profile extends React.Component {
      </div>
    </div>
    <div className="col-md-4">
-   <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>10</Link></h1> different news sources read this week. TheGuardian being your favourite news source.
+   <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>{this.state.data.sources.length}</Link></h1> different news sources read this week. {topSource} being your favourite news source.
      
      <PieChart width={200} height={200}>
         <Pie dataKey="value"  isAnimationActive={false} data={data} cx={100} cy={100} outerRadius={80} fill="#8884d8">
