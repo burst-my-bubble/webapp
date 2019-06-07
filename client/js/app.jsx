@@ -311,6 +311,14 @@ class Profile extends React.Component {
       return {name: title, value: count};
     });
 
+    var TWO_DAYS = new Date();
+    TWO_DAYS.setDate(TWO_DAYS.getDate() - 2);
+
+    var streak = 0;
+    if (new Date(this.state.data2.streak.last_time["$date"]) > TWO_DAYS) {
+      streak = this.state.data2.streak.length;
+    }
+
     return <div className="container">
 <br/>
  <div className="row">
@@ -353,7 +361,7 @@ class Profile extends React.Component {
        </div>
      
    <div className="col-md-4">
-     <div className="card stat"><h1>5</h1> day streak.</div>
+     <div className="card stat"><h1>{streak}</h1> day streak.</div>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. {topCategory} being your favourite category.
