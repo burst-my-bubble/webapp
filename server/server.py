@@ -229,6 +229,7 @@ def read():
     db.users.update_one({"_id": user_id, "read.article_id": {"$ne": article_id}}, {"$push": {"read":{"article_id": article_id, "time": datetime.now()}}})
     NOW = datetime.now()
     TWO_DAYS = timedelta(days=2)
+    DAY = timedelta(days=1)
     db.users.update_one({"_id": user_id, "streak.last_time": {"$lt": NOW - TWO_DAYS}}, {"$set": {"streak": {"length": 1, "last_time": NOW}}})
     db.users.update_one({"_id": user_id, "streak.last_time": {"$gt": NOW - TWO_DAYS, "$lt": NOW - DAY}}, {"$inc": {"streak.length": 1}, "$set": {"streak.last_time": NOW}})
     return jsonify({})
