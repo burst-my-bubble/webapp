@@ -45,13 +45,12 @@ def get_user_article_history(user_id):
 
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
-def gen_category_stats(history):
+def gen_category_stats(cat_details):
     chosenList = dict()
-    for article in history:
-        sentiment = article["sentiment"]
+    for detail in cat_details:
+        sentiment = detail["sentiment"]
         bias = 0.5 #article["sourceBias"]
-        cat = getArticleCategory(article)
-        name = cat
+        name = detail["cat_name"]
         if name in chosenList:
             (count, avgSentiment, avgBias) = chosenList[name]
             chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
@@ -63,25 +62,19 @@ def get_blacklisted_entities():
     return list(db.entities.find({"bl": True}))
 
 #Choice can be "categories" or "entities", returning the history stats for that choice.
-def gen_entity_stats(history):
+def gen_entity_stats(entity_details):
     chosenList = dict()
     blacklist = map(lambda x: x["name"], get_blacklisted_entities())
-    for article in history:
-        sentiment = article["sentiment"]
+    for detail in entity_details:
+        sentiment = detail["sentiment"]
         bias = 0.5 #article["sourceBias"]
-        for field in article["entities"]:
-            name = field["name"]
+        for name in detail["entity_name"]:
             if name in chosenList and not name in blacklist:
                 (count, avgSentiment, avgBias) = chosenList[name]
                 chosenList[name] = (count + 1, get_new_mean(avgSentiment, sentiment, count), get_new_mean(avgBias, bias, count))
             else:
                 chosenList[name] = (1, sentiment, bias)
     return chosenList
-
-#Gets the category of an article
-def getArticleCategory(article):
-    category_id = db.feeds.find_one({"_id": article["feed_id"]})["category_id"]
-    return db.categories.find_one({"_id": category_id})["slug"]
 
 #Gets number of hours between article's publishing and now
 def getDecayScore(article):
@@ -93,6 +86,12 @@ def getDecayScore(article):
     duration = now - article_datetime
     hours = duration.total_seconds() / 3600
     return 30 - int(hours)
+
+    #Gets the category of an article
+def getArticleCategory(article):
+    category_id = db.feeds.find_one({"_id": article["feed_id"]})["category_id"]
+    return db.categories.find_one({"_id": category_id})["slug"]
+
 
 #Given an article and the history stats of that user, scores the article.
 #Stats are of the form (count, avgSentiment, avgEntities)
@@ -118,18 +117,43 @@ def sortByScore(val):
     return -val["score"]
 
 def get_best_matching_articles(user_id, skip, category_id):
+    #Up to incl. line 127 gets recently read articles by user
+    #Entity stats contains just entity names and sentiments of each articles
+    #Category stats contains list of the category name and the article's sentiment
+    stats = list(db.users.aggregate([{"$match": {"_id": user_id}}, 
+        {"$project": {"read": 1}}, {"$unwind": "$read"}, 
+        {"$project": {"_id": "$read.article_id", "access_time": "$read.time"}},
+        {"$sort": {"access_time": -1}},
+        {"$limit": 120},
+        {"$lookup": {"from": "articles", "localField": "_id", "foreignField": "_id", "as": "info"}},
+        {"$facet": {"entity_stats": [
+            {"$project": {"sentiment": {"$arrayElemAt": ["$info.sentiment", 0]},
+                            "entity_name": {"$arrayElemAt": ["$info.entities.name", 0]}, "_id": 0
+                            }},
+        ], "category_stats": [
+            {"$project": {"sentiment": {"$arrayElemAt": ["$info.sentiment", 0]},
+                            "feed_id": {"$arrayElemAt": ["$info.feed_id", 0]}, "_id": 0}},
+            {"$lookup": {"from": "feeds", "localField": "feed_id", "foreignField": "_id", "as": "feed_info"}},
+            {"$project": {"cat_id": {"$arrayElemAt": ["$feed_info.category_id", 0]}, "sentiment": 1 }},
+            {"$lookup": {"from": "categories", "localField": "cat_id", "foreignField": "_id", "as": "cat_info"}},
+            {"$project": {"sentiment": 1, "cat_name": {"$arrayElemAt": ["$cat_info.slug", 0]}}}
+        ], "history": [
+            {"$project":{"_id": {"$arrayElemAt": ["$info._id", 0]}}}]}}]))
     recent_read = get_user_article_history(user_id)[-120:]
-    history = list(db.articles.find({"_id":{"$in": recent_read}}))
-    entity_scores = gen_entity_stats(history)
-    category_scores = gen_category_stats(history)
+    history = stats[0]["history"]
+    entity_scores = gen_entity_stats(stats[0]["entity_stats"])
+    category_scores = gen_category_stats(stats[0]["category_stats"])
     if category_id is None:
         all_articles = list(db.articles.find(limit=120, sort=[("published_date", -1)]))
     else:
+        #Get the feeds
         feeds = db.feeds.find({"category_id": category_id["_id"]}, projection= {"_id": 1})
+        #Get list of feeds corresonding to cat id
         feeds = list(map(lambda x: x["_id"], feeds))
+        #Get all articles in those feeds
         all_articles = list(db.articles.find({"feed_id": {"$in": feeds}}, limit=120, sort=[("published_date", -1)]))
     for article in all_articles:
-        article["score"] = gen_article_score(article, entity_scores, category_scores, article in history)
+        article["score"] = gen_article_score(article, entity_scores, category_scores, article["_id"] in history)
 
     all_articles.sort(key = sortByScore)
     return all_articles[skip: skip+12]
