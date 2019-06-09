@@ -116,6 +116,12 @@ def gen_article_score(article, entityStats, categoryStats, is_in_history):
 def sortByScore(val):
     return -val["score"]
 
+def get_articles_given_entity(entity, skip):
+    return list(db.articles.find({"entities.name": entity["name"]}))[skip: skip+12]
+
+def get_trending_entities():
+    return list(db.entities.find({"bl": "false"}, {"displayName": 1, "name": 1}, sort = [("score", -1)], limit = 5))
+
 def get_best_matching_articles(user_id, skip, category_id):
     #Up to incl. line 127 gets recently read articles by user
     #Entity stats contains just entity names and sentiments of each articles
@@ -222,6 +228,31 @@ def addMetadata(articles):
 @app.route("/api/categories", methods=['GET'])
 def categories():
     return jsonify(list(db.categories.find()))
+
+@app.route("/api/trending", methods=['GET'])
+def trending():
+    return jsonify(get_trending_entities())
+
+@app.route("/api/trending/<entity>", methods=['POST'])
+def articlesByEntity(entity):
+    skip = request.args.get("skip")
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    if skip == None:
+        skip = 0
+    else:
+        try:
+            skip = int(skip)
+        except:
+            skip = 0
+    print(entity)
+    e = db.entities.find_one({"name": entity["name"]})
+    if e is None:
+        return jsonify([])
+    else:
+        displayedArticles = get_articles_given_entity(e, skip) 
+        addMetadata(displayedArticles)
+        return jsonify(displayedArticles)
 
 @app.route("/api/articles/<category>", methods=['POST'])
 def articlesByCategory(category):
