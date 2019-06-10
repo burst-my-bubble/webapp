@@ -455,11 +455,10 @@ class Comments extends React.Component {
   
 
   render() {
-    var d = new Date(article.published_date.$date);
-    if(d == null){
-      dstr = "No Date"
+    if(article.published_date == null){
+      dstr = "No Date";
     } else {
-      dstr = d.toDateString()
+      dstr = new Date(article.published_date.$date.toDateString());
     }
     if (!this.state.loaded) {
       return null;
