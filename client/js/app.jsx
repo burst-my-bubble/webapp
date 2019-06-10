@@ -704,6 +704,7 @@ class Home extends React.Component {
             <Link to={"/article/" + id + "/comments"} className="card-link">Comments&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</Link>
             <span style={{color:this.getColour(article.sentiment)}}>◉</span>
             {tags}
+            <span className="label badge badge-primary badge-primary">{new Date(article.published_date.$date).toDateString()}</span>
           </div>
         </div>
       </div>;
