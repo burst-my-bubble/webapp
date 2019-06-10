@@ -364,6 +364,7 @@ class Profile extends React.Component {
      
    <div className="col-md-4">
      <div className="card stat"><h1>{streak}</h1> day streak.</div>
+    <table>Hello</table>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. {topCategory} being your favourite category.
@@ -556,6 +557,7 @@ class Navbar extends React.Component {
   </button> 
       <div className={"navbar-collapse " + this.state.mobileDropdown}>
       <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li className="nav-item"><Link className="nav-link ikaros" to={"/trending"}>Trending</Link></li>
        {categories}
       </ul>
       </div>   
@@ -814,7 +816,7 @@ class Home extends React.Component {
 class Trending extends React.Component {
   otherfunc(data){
     console.log(data)
-    var words = data.map((x) => {return {text: x.name, size: x.score, test: "haha"}});
+    var words = data.map((x) => {return {text: x.name, size: x.score/2, test: "haha"}});
     this.layout = cloud()
     .size([500, 500])
     .words(words)
