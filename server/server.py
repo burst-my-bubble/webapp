@@ -167,6 +167,41 @@ def get_best_matching_articles(user_id, skip, category_id):
 def pick(a, prop):
     return [x[prop] for x in a]
 
+@app.route("/api/comment", methods=['POST'])
+def comment():
+    content = request.json
+    print(content)
+    user_id = ObjectId(content["user_id"]["$oid"])
+    article_id = ObjectId(content["article_id"])
+    against = content["against"]
+    statement = content["statement"]
+    print(user_id, article_id, against, statement)
+    db.comments.insert({"user_id": user_id, "article_id": article_id, "against": against, "statement": statement})
+    return jsonify({})
+
+@app.route("/api/get_comments", methods=['POST'])
+def get_comments():
+    content = request.json
+    print(content)
+    article_id = ObjectId(content["article_id"])
+    against = content["against"]
+    return jsonify(db.comments.find({"article_id": article_id, "against": against}))
+
+@app.route("/api/thumbs_up", methods=['POST'])
+def thumbs_up():
+    content = request.json
+    print(content)
+    comment_id = content["comment_id"]
+    db.comment.update_one({"_id":comment_id} ,{"$inc": {"thumbs_up": 1}})
+    return jsonify({})
+
+@app.route("/api/get_article", methods=['POST'])
+def get_article():
+    content = request.json
+    print(content)
+    article_id = ObjectId(content["article_id"])
+    return jsonify(db.articles.find_one({"_id": article_id}))
+
 @app.route("/api/get_name", methods=['POST'])
 def get_name():
     content = request.json
