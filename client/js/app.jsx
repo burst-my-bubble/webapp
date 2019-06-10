@@ -4,6 +4,8 @@ import axios from "axios";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import CalendarHeatmap from 'react-calendar-heatmap';
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import cloud from "d3-cloud";
+import * as d3 from "d3";
 
 class Login extends React.Component {
   render() {
@@ -587,6 +589,7 @@ class Main extends React.Component {
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/categories/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending/:entity" exact component={({match}) => <Home url={"/trending/" + match.params.entity} id={this.props.id} _id={this.props._id}/>}/>
+        <Route path="/trending" exact component={() => <Trending id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/settings" exact component={() => <Settings _id={this.props._id} id={this.props.id}/>}/>
         <Route component={NoMatch}/>
       </Switch>
@@ -759,6 +762,50 @@ class Home extends React.Component {
   }
 
 
+}
+
+class Trending extends React.Component {
+  otherfunc(data){
+    console.log(data)
+    var words = data.map((x) => {return {text: x.name, size: x.score* 10, test: "haha"}});
+    this.layout = cloud()
+    .size([500, 500])
+    .words(words)
+    .padding(5)
+    .rotate(function() { return ~~(Math.random() * 2) * 90; })
+    .font("Impact")
+    .fontSize(function(d) { return d.size; })
+    .on("end", this.draw.bind(this))
+    this.layout.start();
+  }
+  componentDidMount(){
+    axios.post(SERVER_URI + "api/articles/trending", {}).then(({data}) => {
+      this.otherfunc(data);
+    });
+  }
+
+  draw(words) {
+    d3.select("#Graph").append("svg")
+        .attr("width", this.layout.size()[0])
+        .attr("height", this.layout.size()[1])
+      .append("g")
+        .attr("transform", "translate(" + this.layout.size()[0] / 2 + "," + this.layout.size()[1] / 2 + ")")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .attr("text-anchor", "middle")
+        .on("click", (d)=> {window.location = "/trending/" + d.text})
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+  }
+
+  render() {
+    return <div id="Graph"></div>
+  }
 }
 
 window.ready = () => {

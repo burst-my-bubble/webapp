@@ -120,7 +120,7 @@ def get_articles_given_entity(entity, skip):
     return list(db.articles.find({"entities.name": entity["name"]}))[skip: skip+12]
 
 def get_trending_entities():
-    return list(db.entities.find({"bl": "false"}, {"displayName": 1, "score": 1}, sort = [("score", -1)], limit = 20))
+    return list(db.entities.find({"bl": "false"}, {"name": 1, "score": 1}, sort = [("score", -1)], limit = 20))
 
 def get_best_matching_articles(user_id, skip, category_id):
     #Up to incl. line 127 gets recently read articles by user
@@ -229,13 +229,12 @@ def addMetadata(articles):
 def categories():
     return jsonify(list(db.categories.find()))
 
-@app.route("/api/trending", methods=['GET'])
-def trending():
+@app.route("/api/articles/trending", methods=['POST'])
+def articlesByEntity():
     return jsonify(get_trending_entities())
 
-
 @app.route("/api/articles/trending/<entity>", methods=['POST'])
-def articlesByEntity(entity):
+def trendingEntities(entity):
     skip = request.args.get("skip")
     if skip == None:
         skip = 0
