@@ -233,11 +233,10 @@ def categories():
 def trending():
     return jsonify(get_trending_entities())
 
-@app.route("/api/trending/<entity>", methods=['POST'])
+
+@app.route("/api/articles/trending/<entity>", methods=['POST'])
 def articlesByEntity(entity):
     skip = request.args.get("skip")
-    content = request.json
-    user_id = ObjectId(content["user_id"]["$oid"])
     if skip == None:
         skip = 0
     else:
@@ -245,16 +244,15 @@ def articlesByEntity(entity):
             skip = int(skip)
         except:
             skip = 0
-    print(entity)
-    e = db.entities.find_one({"name": entity["name"]})
+    e = db.entities.find_one({"name": entity})
     if e is None:
         return jsonify([])
     else:
-        displayedArticles = get_articles_given_entity(e, skip) 
+        displayedArticles = get_articles_given_entity(e, skip)
         addMetadata(displayedArticles)
         return jsonify(displayedArticles)
 
-@app.route("/api/articles/<category>", methods=['POST'])
+@app.route("/api/articles/categories/<category>", methods=['POST'])
 def articlesByCategory(category):
     skip = request.args.get("skip")
     content = request.json

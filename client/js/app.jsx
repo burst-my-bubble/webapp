@@ -585,7 +585,8 @@ class Main extends React.Component {
         <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
         <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
-        <Route path="/categories/:category" exact component={({match}) => <Home url={"/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
+        <Route path="/categories/:category" exact component={({match}) => <Home url={"/categories/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
+        <Route path="/trending/:entity" exact component={({match}) => <Home url={"/trending/" + match.params.entity} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/settings" exact component={() => <Settings _id={this.props._id} id={this.props.id}/>}/>
         <Route component={NoMatch}/>
       </Switch>
@@ -751,7 +752,7 @@ class Home extends React.Component {
     if (url == "") {
       return "Your Feed";
     } else {
-      var key = url.substr(1)
+      var key = url.split('/')[2];
       return key.charAt(0).toUpperCase() + key.slice(1) + " Feed";
     }
   }
