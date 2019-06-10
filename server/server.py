@@ -64,7 +64,7 @@ def get_blacklisted_entities():
 #Choice can be "categories" or "entities", returning the history stats for that choice.
 def gen_entity_stats(entity_details):
     chosenList = dict()
-    blacklist = map(lambda x: x["name"], get_blacklisted_entities())
+    blacklist = map(lambda x: x.get('name', None), get_blacklisted_entities())
     for detail in entity_details:
         sentiment = detail["sentiment"]
         bias = 0.5 #article["sourceBias"]
