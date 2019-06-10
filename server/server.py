@@ -120,7 +120,7 @@ def get_articles_given_entity(entity, skip):
     return list(db.articles.find({"entities.name": entity["name"]}))[skip: skip+12]
 
 def get_trending_entities():
-    return list(db.entities.find({"bl": "false"}, {"displayName": 1, "score": 1}, sort = [("score", -1)], limit = 20))
+    return list(db.entities.find({"bl": False}, {"name": 1, "score": 1}).sort([("score", -1)]).limit(20))
 
 def get_best_matching_articles(user_id, skip, category_id):
     #Up to incl. line 127 gets recently read articles by user
@@ -264,15 +264,13 @@ def addMetadata(articles):
 def categories():
     return jsonify(list(db.categories.find()))
 
-@app.route("/api/trending", methods=['GET'])
-def trending():
+@app.route("/api/articles/trending", methods=['POST'])
+def articlesByEntity():
     return jsonify(get_trending_entities())
 
-@app.route("/api/trending/<entity>", methods=['POST'])
-def articlesByEntity(entity):
+@app.route("/api/articles/trending/<entity>", methods=['POST'])
+def trendingEntities(entity):
     skip = request.args.get("skip")
-    content = request.json
-    user_id = ObjectId(content["user_id"]["$oid"])
     if skip == None:
         skip = 0
     else:
@@ -280,16 +278,15 @@ def articlesByEntity(entity):
             skip = int(skip)
         except:
             skip = 0
-    print(entity)
-    e = db.entities.find_one({"name": entity["name"]})
+    e = db.entities.find_one({"name": entity})
     if e is None:
         return jsonify([])
     else:
-        displayedArticles = get_articles_given_entity(e, skip) 
+        displayedArticles = get_articles_given_entity(e, skip)
         addMetadata(displayedArticles)
         return jsonify(displayedArticles)
 
-@app.route("/api/articles/<category>", methods=['POST'])
+@app.route("/api/articles/categories/<category>", methods=['POST'])
 def articlesByCategory(category):
     skip = request.args.get("skip")
     content = request.json
