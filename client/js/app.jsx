@@ -364,6 +364,7 @@ class Profile extends React.Component {
      
    <div className="col-md-4">
      <div className="card stat"><h1>{streak}</h1> day streak.</div>
+    <table>Hello</table>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. {topCategory} being your favourite category.
