@@ -767,7 +767,7 @@ class Home extends React.Component {
 class Trending extends React.Component {
   otherfunc(data){
     console.log(data)
-    var words = data.map((x) => {return {text: x.name, size: x.score, test: "haha"}});
+    var words = data.map((x) => {return {text: x.name, size: x.score/2, test: "haha"}});
     this.layout = cloud()
     .size([500, 500])
     .words(words)
