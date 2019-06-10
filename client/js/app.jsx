@@ -437,8 +437,48 @@ class Profile extends React.Component {
   }
 }
 
-const Comments = () => 
-  <p>Comments Page</p>;
+class Comments extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loaded: false,
+      dropdown: ""
+    };
+    axios.post(SERVER_URI + "api/get_article", {article_id: this.props.aid}).then(({data}) => {
+      this.setState({
+        data: data,
+        loaded: true
+      });
+    });
+  }
+
+  render() {
+
+    if (!this.state.loaded) {
+      return null;
+    }
+    var article = this.state.data;
+    return <div className="container">
+
+      <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
+          <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
+            <img src={article.image_url} className="card-img-top"/>
+          </a>
+          <div className="card-body body-font">
+            <p className="card-text">
+              <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
+            </p>
+            <p>
+              {article.description}
+            </p>
+            <span className="label badge badge-primary badge-primary">{new Date(article.published_date.$date).toDateString()}</span>
+          </div>
+        </div>
+
+    </div>;
+  }
+
+}
 
 const NoMatch = () =>
   <p>Page Not Found</p>;
@@ -586,7 +626,8 @@ class Main extends React.Component {
         <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
-        <Route path="/article/:id/comments" exact component={() => <Comments id={this.props.id}/>}/>
+
+        <Route path="/article/:id/comments" exact component={({match}) => <Comments id={this.props.id} aid={match.params.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/categories/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending/:entity" exact component={({match}) => <Home url={"/trending/" + match.params.entity} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending" exact component={() => <Trending id={this.props.id} _id={this.props._id}/>}/>
@@ -704,7 +745,7 @@ class Home extends React.Component {
             <p className="card-text">
               <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
             </p>
-            <Link to={"/article/" + id + "/comments"} className="card-link">Comments&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</Link>
+            <Link to={"/article/" + id + "/comments"} className="card-link">Opinions&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</Link>
             <span style={{color:this.getColour(article.sentiment)}}>◉</span>
             {tags}
             <span className="label badge badge-primary badge-primary">{new Date(article.published_date.$date).toDateString()}</span>
