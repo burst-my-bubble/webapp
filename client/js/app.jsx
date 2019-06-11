@@ -330,6 +330,7 @@ class Profile extends React.Component {
         <br/><br/>
         <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
         <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
+        <p style={{textAlign:"center"}}>"{this.state.data2.status}"</p>
      </div>
      <br/>
      <div className="stat">
@@ -672,10 +673,13 @@ class Friends extends React.Component {
     }
 
     console.log(this.state.data);
-    const people = this.state.data.map(({_id, id, name}) => {
+    const people = this.state.data.map(({_id, id, name, status}) => {
       return <div className="col-md-3" key={id}><div className="card article"><div className="card-body">
-        <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
-        <h4>{name}</h4>
+        <Link to={"/user/" + _id["$oid"]}><img className="friend" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
+        <br/>
+        <h4 style={{textAlign: "center"}}>{name}</h4>
+        <br/>
+        <p style={{textAlign: "center"}}>"{status}"</p>
       </div></div></div>
     });
 
