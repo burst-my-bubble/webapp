@@ -364,8 +364,16 @@ class Profile extends React.Component {
        </div>
      
    <div className="col-md-4">
-     <div className="card stat"><h1>{streak}</h1> day streak.</div>
-    <table>Hello</table>
+     <div className="card stat"><p style={{fontSize: "30px"}}>{streak} day streak.</p>    
+     <br/>
+      <table style={{fontSize: "20px"}}>
+        <tr><td>1</td><td><img src="https://graph.facebook.com/834147103608464/picture?type=small"/></td><td>Hashan</td><td>200</td></tr>
+        <tr><td>2</td><td><img src="https://graph.facebook.com/2830315710343819/picture?type=small"/></td><td>Hugo</td><td>4</td></tr>
+        <tr><td>3</td><td><img src="https://graph.facebook.com/10214598360096105/picture?type=small"/></td><td>Jack</td><td>3</td></tr>
+        <tr><td>4</td><td><img src="https://graph.facebook.com/2062703670502448/picture?type=small"/></td><td>Joe</td><td>2</td></tr>
+      </table>
+      <br/><br/>
+    </div>
    </div>
    <div className="col-md-4">
      <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. {topCategory} being your favourite category.
@@ -852,17 +860,23 @@ class Home extends React.Component {
 }
 
 class Trending extends React.Component {
+
   otherfunc(data){
     console.log(data)
-    var words = data.map((x) => {return {text: x.name, size: x.score/2, test: "haha"}});
+    var words = data.map((x) => {return {text: x.name, size: x.score, test: "haha"}});
+    var myScale = d3.scaleLinear()
+    .domain([words[words.length - 1].size, words[0].size])
+    .range([20,50]);
+    console.log(words[words.length - 1].size, words[0].size);
+    console.log(myScale(0));
     this.layout = cloud()
-    .size([500, 500])
+    .size([1600, 800])
     .words(words)
     .padding(5)
-    .rotate(function() { return ~~(Math.random() * 2) * 90; })
-    .font("Impact")
-    .fontSize(function(d) { return d.size; })
-    .on("end", this.draw.bind(this))
+    .rotate(d3.randomUniform(-70, 70))
+    .font("ubuntu")
+    .fontSize(d => myScale(d.size))
+    .on("end", this.draw.bind(this));
     this.layout.start();
   }
   componentDidMount(){
@@ -875,13 +889,18 @@ class Trending extends React.Component {
     d3.select("#Graph").append("svg")
         .attr("width", this.layout.size()[0])
         .attr("height", this.layout.size()[1])
+        .style("display", "block")
+        .style("margin", "auto")
       .append("g")
         .attr("transform", "translate(" + this.layout.size()[0] / 2 + "," + this.layout.size()[1] / 2 + ")")
       .selectAll("text")
         .data(words)
       .enter().append("text")
         .style("font-size", function(d) { return d.size + "px"; })
-        .style("font-family", "Impact")
+        .style("font-family", "ubuntu")
+        .style("font-weight", "bold")
+        .style("cursor", "pointer")
+        .style("fill", () => d3.schemeCategory10[Math.floor(Math.random() * d3.schemeCategory10.length)])
         .attr("text-anchor", "middle")
         .on("click", (d)=> {window.location = "/trending/" + d.text})
         .attr("transform", function(d) {
