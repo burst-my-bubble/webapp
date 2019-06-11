@@ -455,15 +455,15 @@ class Comments extends React.Component {
   
 
   render() {
-    if(article.published_date == null){
-      dstr = "No Date";
-    } else {
-      dstr = new Date(article.published_date.$date.toDateString());
-    }
     if (!this.state.loaded) {
       return null;
     }
     var article = this.state.data;
+    console.log(article.published_date);
+    var dstr = "No Date";
+     if(article.published_date != null){
+       dstr = new Date(article.published_date.$date).toDateString();
+     }
     return <div className="container">
 
       <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
@@ -477,8 +477,7 @@ class Comments extends React.Component {
             <p>
               <div className="no_img" dangerouslySetInnerHTML={{ __html: article.description }} />
             </p>
-            <span className="label badge badge-primary badge-primary">{dstr}</span>
-          </div>
+            <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
 
     </div>;
