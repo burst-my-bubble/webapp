@@ -808,17 +808,23 @@ class Home extends React.Component {
 }
 
 class Trending extends React.Component {
+
   otherfunc(data){
     console.log(data)
-    var words = data.map((x) => {return {text: x.name, size: x.score/2, test: "haha"}});
+    var words = data.map((x) => {return {text: x.name, size: x.score, test: "haha"}});
+    var myScale = d3.scaleLinear()
+    .domain([words[words.length - 1].size, words[0].size])
+    .range([20,50]);
+    console.log(words[words.length - 1].size, words[0].size);
+    console.log(myScale(0));
     this.layout = cloud()
-    .size([500, 500])
+    .size([1600, 800])
     .words(words)
     .padding(5)
-    .rotate(function() { return ~~(Math.random() * 2) * 90; })
-    .font("Impact")
-    .fontSize(function(d) { return d.size; })
-    .on("end", this.draw.bind(this))
+    .rotate(d3.randomUniform(-70, 70))
+    .font("ubuntu")
+    .fontSize(d => myScale(d.size))
+    .on("end", this.draw.bind(this));
     this.layout.start();
   }
   componentDidMount(){
@@ -831,13 +837,18 @@ class Trending extends React.Component {
     d3.select("#Graph").append("svg")
         .attr("width", this.layout.size()[0])
         .attr("height", this.layout.size()[1])
+        .style("display", "block")
+        .style("margin", "auto")
       .append("g")
         .attr("transform", "translate(" + this.layout.size()[0] / 2 + "," + this.layout.size()[1] / 2 + ")")
       .selectAll("text")
         .data(words)
       .enter().append("text")
         .style("font-size", function(d) { return d.size + "px"; })
-        .style("font-family", "Impact")
+        .style("font-family", "ubuntu")
+        .style("font-weight", "bold")
+        .style("cursor", "pointer")
+        .style("fill", () => d3.schemeCategory10[Math.floor(Math.random() * d3.schemeCategory10.length)])
         .attr("text-anchor", "middle")
         .on("click", (d)=> {window.location = "/trending/" + d.text})
         .attr("transform", function(d) {
