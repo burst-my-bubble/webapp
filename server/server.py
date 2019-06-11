@@ -191,8 +191,9 @@ def get_comments():
 def thumbs_up():
     content = request.json
     print(content)
-    comment_id = content["comment_id"]
-    db.comment.update_one({"_id":comment_id} ,{"$inc": {"thumbs_up": 1}})
+    comment_id = ObjectId(content["comment_id"]["$oid"])
+    print(comment_id)
+    db.comments.update_one({"_id":comment_id} , {"$inc": {"thumbs_up": 1}})
     return jsonify({})
 
 @app.route("/api/get_article", methods=['POST'])
@@ -200,7 +201,10 @@ def get_article():
     content = request.json
     print(content)
     article_id = ObjectId(content["article_id"])
-    return jsonify(db.articles.find_one({"_id": article_id}))
+    article = db.articles.find_one({"_id": article_id})
+    article["negComments"] = list(db.comments.aggregate([{"$match": {"article_id": article_id, "against": True}}, {"$sample" : {"size": 5}}, {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "user"}}]))
+    article["posComments"] = list(db.comments.aggregate([{"$match": {"article_id": article_id, "against": False}}, {"$sample" : {"size": 5}}, {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "user"}}]))
+    return jsonify(article)
 
 @app.route("/api/get_name", methods=['POST'])
 def get_name():
