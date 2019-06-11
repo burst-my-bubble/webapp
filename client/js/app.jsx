@@ -160,11 +160,20 @@ class ProfileSources extends React.Component {
 
     return <div className="container">
       <br/>
+    <div className="row">
+        <div className="col-md-3">
+          <Sidebar myid={this.props.myid} _id ={this.props._id}/>
+        </div>
+      <div className="col-md-9">
+        <ProfileNav active={"Sources"}_id={this.props._id} />
+        <br/>
       <table className="table table-bordered">
         <tbody>
           {entries}
         </tbody>
       </table>
+      </div>
+      </div>
       <br/>
       <PieChart width={400} height={400}>
         <Pie dataKey="value" label={customLabel} isAnimationActive={false} data={data} cx={200} cy={200} outerRadius={80} fill="#8884d8">
@@ -206,12 +215,34 @@ class ProfileCategories extends React.Component {
 
     return <div className="container">
       <br/>
-      <table className="table table-bordered">
-        <tbody>
-          {entries}
-        </tbody>
-      </table>
+      <div className="row">
+        <div className="col-md-3">
+          <Sidebar myid={this.props.myid} _id ={this.props._id}/>
+        </div>
+        <div className="col-md-9">      
+        <ProfileNav active={"Categories"} _id={this.props._id} />
+        <br/>
+        <table className="table table-bordered">
+          <tbody>
+            {entries}
+          </tbody>
+        </table>
+        </div>
+      </div>
     </div>
+  }
+}
+
+class ProfileNav extends React.Component {
+  render() {
+    return <div className="small-nav">
+     <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <Link to={"/user/" + this.props._id["$oid"]} className={"nav-link" + (this.props.active === "Summary"? " active": "")}>Summary</Link>
+          <Link to={"/user/" + this.props._id["$oid"] + "/categories"} className={"nav-link"+ (this.props.active === "Categories"? " active": "")}>Categories</Link>
+          <Link to={"/user/" + this.props._id["$oid"] + "/sources"} className={"nav-link"+ (this.props.active === "Sources"? " active": "")} >Sources</Link>
+          <Link to={"/user/" + this.props._id["$oid"] + "/archive"} className={"nav-link" + (this.props.active === "Archive"? " active": "")}>Archive</Link>
+        </div>
+     </div>
   }
 }
 
@@ -260,16 +291,7 @@ class Profile extends React.Component {
     });
   }
 
-  handleClose() {
-    this.setState({show: false});
-  }
 
-  handleSubmit() {
-    axios.post(SERVER_URI + "api/edit_status", {user_id: this.props._id, status: this.state.status}).then(() => {
-      this.handleClose();
-      this.loadData();
-    });
-  }
 
   render() {
     if (!this.state.loaded) {
@@ -289,7 +311,6 @@ class Profile extends React.Component {
     var notTodayButLastWeek = lastWeek.filter(a => !this.sameDay(a.access_time, TODAY));
     var lastMonth = articles.filter(a => this.daysBetween(a.access_time, TODAY) > 7);
 
-    var joinDate = new Date(this.state.data2["joined"].$date);
 
     var map = {};
     articles.forEach(a => {
@@ -334,42 +355,11 @@ class Profile extends React.Component {
     if (new Date(this.state.data2.streak.last_time["$date"]) > TWO_DAYS) {
       streak = this.state.data2.streak.length;
     }
-    var button = null;
-      console.log(this.props.myid);
-      console.log(this.props._id);
-    if (this.props.myid["$oid"] === this.props._id["$oid"]) {
-      console.log("yoooooo");
-      button = <button className="btn btn-link" onClick={() => this.setState({show: true})}>
-        <img src="/edit_icon.svg"/></button>
-    }
     return <div className="container">
 <br/>
  <div className="row">
    <div className="col-md-3">
-     <div className="sidebar stat">
-        <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data2.id + "/picture?width=900"}/>
-        <br/><br/>
-        <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
-        <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
-        <p style={{textAlign:"center"}}>"{this.state.data2.status}" {button} </p>
-     </div>
-     <br/>
-     <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Edit Status</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <textarea className="form-control edit-status" onChange={(e) => this.setState({status: e.target.value})} placeholder="Write an awesome status here."></textarea>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleClose.bind(this)}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={this.handleSubmit.bind(this)}>
-              Save Changes
-            </Button>
-          </Modal.Footer>
-        </Modal>
+       <Sidebar id={this.props.id} _id={this.props._id} myid={this.props.myid}/>
 
      <div className="stat">
      <CalendarHeatmap
@@ -390,14 +380,7 @@ class Profile extends React.Component {
    <div className="col-md-9">
      <div className="row">
        <div className="col-md-12">
-       <div className="small-nav">
-     <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <Link to={"/user/" + this.props._id["$oid"]} className="nav-link active">Summary</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/categories"} className="nav-link">Categories</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/sources"} className="nav-link">Sources</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/archive"} className="nav-link">Archive</Link>
-        </div>
-     </div>
+        <ProfileNav active={"Summary"} _id={this.props._id}/>
      <br/>
        </div>
      
@@ -647,6 +630,85 @@ class Comments extends React.Component {
 const NoMatch = () =>
   <p>Page Not Found</p>;
 
+class Sidebar extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      loaded: false,
+      show: false 
+    }; 
+  }
+
+  componentDidMount() {
+    this.loadData();
+  }
+
+  handleClose() {
+    this.setState({show: false});
+  }
+
+  handleSubmit() {
+    axios.post(SERVER_URI + "api/edit_status", {user_id: this.props._id, status: this.state.status}).then(() => {
+      this.handleClose();
+      this.loadData();
+    })
+  }
+
+  loadData() {
+    var id = this.props._id;
+      axios.post(SERVER_URI + "api/get_name", {user_id: id}).then((a) => {
+        this.setState({
+          loaded: true,
+          data: a.data,
+          loadedId: id,
+          id: id
+        });
+      });
+  }
+
+  render() { 
+    if (!this.state.loaded) {
+      return null;
+    }
+
+    var button = null;
+    if (this.props.myid["$oid"] === this.props._id["$oid"]) {
+      console.log("yoooooo");
+      button = <button className="btn btn-link" onClick={() => this.setState({show: true})}>
+        <img src="/edit_icon.svg"/></button>
+    }
+
+    var joinDate = new Date(this.state.data["joined"].$date);
+
+    return <div>
+  <div className="sidebar stat">
+  <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data.id + "/picture?width=900"}/>
+    <br/><br/>
+    <h2 style={{textAlign:"center"}}>{this.state.data["name"]}</h2>
+    <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
+    <p style={{textAlign:"center"}}>"{this.state.data.status}" {button} </p>
+  </div>
+  <br/>
+  <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
+      <Modal.Header closeButton>
+        <Modal.Title>Edit Status</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <textarea className="form-control edit-status" onChange={(e) => this.setState({status: e.target.value})} placeholder="Write an awesome status here."></textarea>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={this.handleClose.bind(this)}>
+          Close
+        </Button>
+        <Button variant="primary" onClick={this.handleSubmit.bind(this)}>
+          Save Changes
+        </Button>
+      </Modal.Footer>
+    </Modal>
+    </div>
+}
+}
+
 class Navbar extends React.Component {
   constructor() {
     super();
@@ -787,8 +849,8 @@ class Main extends React.Component {
       <Navbar id={this.props.id} _id={this.props._id} logout={this.props.logout}/>
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
-        <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  id={this.props.id}/>}/>
-        <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
+        <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  myid={this.props._id} id={this.props.id}/>}/>
+        <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} myid={this.props._id} id={this.props.id}/>}/>
         <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
 
@@ -1024,7 +1086,7 @@ class Trending extends React.Component {
   }
 
   render() {
-    return <div id="Graph"></div>
+    return <div style={{marginTop: "60px"}}id="Graph"></div>
   }
 }
 
