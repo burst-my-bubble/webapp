@@ -265,7 +265,10 @@ class Profile extends React.Component {
   }
 
   handleSubmit() {
-    axios.post(SERVER_URI + "api/edit_status", {user_id: this.props._id, status: this.state.status}).then(() => this.handleClose());
+    axios.post(SERVER_URI + "api/edit_status", {user_id: this.props._id, status: this.state.status}).then(() => {
+      this.handleClose();
+      this.loadData();
+    });
   }
 
   render() {
