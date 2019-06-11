@@ -176,7 +176,7 @@ def comment():
     against = content["against"]
     statement = content["statement"]
     print(user_id, article_id, against, statement)
-    db.comments.insert({"user_id": user_id, "article_id": article_id, "against": against, "statement": statement})
+    db.comments.update({"user_id": user_id, "article_id": article_id}, {"user_id": user_id, "article_id": article_id, "against": against, "statement": statement, "thumbs_up": 0}, upsert=True)
     return jsonify({})
 
 @app.route("/api/get_comments", methods=['POST'])
@@ -185,7 +185,7 @@ def get_comments():
     print(content)
     article_id = ObjectId(content["article_id"])
     against = content["against"]
-    return jsonify(db.comments.find({"article_id": article_id, "against": against}))
+    return jsonify(db.comments.aggregate([{"$match": {"article_id": article_id, "against": against}}, {"$sample" : {"size": 5}}]))
 
 @app.route("/api/thumbs_up", methods=['POST'])
 def thumbs_up():

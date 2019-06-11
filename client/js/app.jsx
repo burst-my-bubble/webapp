@@ -6,6 +6,7 @@ import CalendarHeatmap from 'react-calendar-heatmap';
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import cloud from "d3-cloud";
 import * as d3 from "d3";
+import Toggle from 'react-bootstrap-toggle';
 
 class Login extends React.Component {
   render() {
@@ -450,7 +451,11 @@ class Profile extends React.Component {
 class Comments extends React.Component {
   constructor(props) {
     super(props);
+    this.onToggle = this.onToggle.bind(this);
     this.state = {
+      message: "",
+      placeholder:"Share your best reason for supporting or opposing this article",
+      toggleActive: true,
       loaded: false,
       dropdown: ""
     };
@@ -462,15 +467,35 @@ class Comments extends React.Component {
     });
   }
   
+  onToggle() {
+    this.setState({ toggleActive: !this.state.toggleActive });
+  }
+
+  handleChange(event) {
+    this.setState({message: event.target.value})
+  }
+
+  submitComment(){
+    //post to comment endpoint
+    // 
+    
+    console.log(this.state.message);
+    console.log(!this.state.toggleActive);
+
+    axios.post(SERVER_URI + "api/comment", {user_id:this.props._id, article_id:this.props.aid, against:!this.state.toggleActive, statement:this.state.message});
+    this.setState({placeholder: "Thank you for submitting your comment! If you would like to override it with a new one, please just submit again"});
+    this.setState({message: ""});
+
+  }
 
   render() {
     if (!this.state.loaded) {
       return null;
     }
+
     var article = this.state.data;
-    console.log(article.published_date);
     var dstr = "No Date";
-     if(article.published_date != null){
+    if(article.published_date != null){
        dstr = new Date(article.published_date.$date).toDateString();
      }
     return <div className="container">
@@ -488,9 +513,29 @@ class Comments extends React.Component {
             </p>
             <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
+        <br></br>
+        <div className="form-group">
+          <label htmlFor="comment">Your Opinion:</label>
+          <textarea className="form-control" rows="5" id="comment" onChange={(e) => this.handleChange(e)} value={this.state.message} placeholder={this.state.placeholder}></textarea>
+        </div>
+        <Toggle
+          onClick={this.onToggle}
+          on={<h2 style={{fontSize:"16px", paddingRight:"13px"}} className="rightalign">Support</h2>}
+          off={<h2 style={{fontSize:"16px", paddingLeft:"13px"}} className="rightalign">Oppose</h2>}
+          size="xs"
+          onstyle="success"
+          offstyle="danger"
+          handlestyle="default"
+          active={this.state.toggleActive}
+          width={100}
+          height={38}
+        />
+        <button className="btn btn-secondary" onClick={() => this.submitComment()}>Submit</button>
 
     </div>;
+
   }
+
 
 }
 
@@ -642,7 +687,7 @@ class Main extends React.Component {
         <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
 
-        <Route path="/article/:id/comments" exact component={({match}) => <Comments id={this.props.id} aid={match.params.id}/>}/>
+        <Route path="/article/:id/comments" exact component={({match}) => <Comments _id={this.props._id} id={this.props.id} aid={match.params.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/categories/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending/:entity" exact component={({match}) => <Home url={"/trending/" + match.params.entity} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending" exact component={() => <Trending id={this.props.id} _id={this.props._id}/>}/>
