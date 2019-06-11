@@ -160,11 +160,18 @@ class ProfileSources extends React.Component {
 
     return <div className="container">
       <br/>
+    <div className="row">
+        <div className="col-md-3">
+          <Sidebar myid={this.props.myid} _id ={this.props._id}/>
+        </div>
+      <div className="col-md-9">
       <table className="table table-bordered">
         <tbody>
           {entries}
         </tbody>
       </table>
+      </div>
+      </div>
       <br/>
       <PieChart width={400} height={400}>
         <Pie dataKey="value" label={customLabel} isAnimationActive={false} data={data} cx={200} cy={200} outerRadius={80} fill="#8884d8">
@@ -819,7 +826,7 @@ class Main extends React.Component {
       <Navbar id={this.props.id} _id={this.props._id} logout={this.props.logout}/>
       <Switch>
         <Route path="/" exact component={() => <Home url="" id={this.props.id} _id={this.props._id}/>}/>
-        <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  id={this.props.id}/>}/>
+        <Route path="/user/:id/sources" exact component={({match}) => <ProfileSources _id={{"$oid":match.params.id}}  myid={this.props._id} id={this.props.id}/>}/>
         <Route path="/user/:id/categories" exact component={({match}) => <ProfileCategories _id={{"$oid":match.params.id}} myid={this.props._id} id={this.props.id}/>}/>
         <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
