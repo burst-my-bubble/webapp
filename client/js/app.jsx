@@ -444,6 +444,7 @@ class Comments extends React.Component {
     super(props);
     this.onToggle = this.onToggle.bind(this);
     this.state = {
+      message: "",
       toggleActive: true,
       loaded: false,
       dropdown: ""
@@ -460,10 +461,18 @@ class Comments extends React.Component {
     this.setState({ toggleActive: !this.state.toggleActive });
   }
 
+  handleChange(event) {
+    this.setState({message: event.target.value})
+  }
+
   submitComment(){
     //post to comment endpoint
     // 
-    console.log("hi");
+    
+    console.log(this.state.message);
+    console.log(!this.state.toggleActive);
+
+    axios.post(SERVER_URI + "api/comment", {user_id:this.props._id, article_id:this.props.aid, against:!this.state.toggleActive, statement:this.state.message})
   }
 
   render() {
@@ -471,7 +480,6 @@ class Comments extends React.Component {
       return null;
     }
     var article = this.state.data;
-    console.log(article.published_date);
     var dstr = "No Date";
      if(article.published_date != null){
        dstr = new Date(article.published_date.$date).toDateString();
@@ -491,10 +499,10 @@ class Comments extends React.Component {
             </p>
             <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
-
+        <br></br>
         <div className="form-group">
           <label htmlFor="comment">Your Opinion:</label>
-          <textarea className="form-control" rows="5" id="comment" placeholder="Share your best reason for supporting or opposing this article"></textarea>
+          <textarea className="form-control" rows="5" id="comment" onChange={(e) => this.handleChange(e)} placeholder="Share your best reason for supporting or opposing this article"></textarea>
         </div>
         <Toggle
           onClick={this.onToggle}
@@ -665,7 +673,7 @@ class Main extends React.Component {
         <Route path="/user/:id" exact component={({match}) => <Profile myid={this.props._id} _id={{"$oid":match.params.id}} id={this.props.id}/>}/>
         <Route path="/friends" exact component={() => <Friends _id={this.props._id} id={this.props.id}/>}/>
 
-        <Route path="/article/:id/comments" exact component={({match}) => <Comments id={this.props.id} aid={match.params.id}/>}/>
+        <Route path="/article/:id/comments" exact component={({match}) => <Comments _id={this.props._id} id={this.props.id} aid={match.params.id}/>}/>
         <Route path="/categories/:category" exact component={({match}) => <Home url={"/categories/" + match.params.category} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending/:entity" exact component={({match}) => <Home url={"/trending/" + match.params.entity} id={this.props.id} _id={this.props._id}/>}/>
         <Route path="/trending" exact component={() => <Trending id={this.props.id} _id={this.props._id}/>}/>
