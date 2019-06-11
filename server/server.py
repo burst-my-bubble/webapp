@@ -332,8 +332,15 @@ def friends():
     user_id = ObjectId(content["user_id"]["$oid"])
     ids = db.users.find_one({"_id": user_id})["friends"]
     return jsonify(list(db.users.find({"_id": {"$in": ids}}, 
-        projection={"_id": 1, "id": 1, "name": 1})))
+        projection={"_id": 1, "id": 1, "name": 1, "status": 1})))
 
+@app.route("/api/edit_status", methods=['POST'])
+def edit_status():
+    content = request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    status = content["status"]
+    db.users.update({"_id": user_id}, {"$set": {"status": status}})
+    return "OK"
 
 @app.route("/api/all_articles", methods=['POST'])
 def all_articles():

@@ -7,6 +7,7 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import cloud from "d3-cloud";
 import * as d3 from "d3";
 import Toggle from 'react-bootstrap-toggle';
+import { Modal, Button } from "react-bootstrap";
 
 class Login extends React.Component {
   render() {
@@ -218,7 +219,8 @@ class Profile extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      loaded: false
+      loaded: false,
+      show: false 
     }; 
   }
 
@@ -255,6 +257,17 @@ class Profile extends React.Component {
           id: id
         });
       });
+    });
+  }
+
+  handleClose() {
+    this.setState({show: false});
+  }
+
+  handleSubmit() {
+    axios.post(SERVER_URI + "api/edit_status", {user_id: this.props._id, status: this.state.status}).then(() => {
+      this.handleClose();
+      this.loadData();
     });
   }
 
@@ -331,8 +344,27 @@ class Profile extends React.Component {
         <br/><br/>
         <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
         <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
+        <p style={{textAlign:"center"}}>"{this.state.data2.status}" <button onClick={() => this.setState({show: true})}>Edit</button></p>
      </div>
      <br/>
+
+     <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Status</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <textarea className="form-control edit-status" onChange={(e) => this.setState({status: e.target.value})} placeholder="Write an awesome status here."></textarea>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleClose.bind(this)}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={this.handleSubmit.bind(this)}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
      <div className="stat">
      <CalendarHeatmap
   startDate={TODAY_365}
@@ -760,10 +792,13 @@ class Friends extends React.Component {
     }
 
     console.log(this.state.data);
-    const people = this.state.data.map(({_id, id, name}) => {
+    const people = this.state.data.map(({_id, id, name, status}) => {
       return <div className="col-md-3" key={id}><div className="card article"><div className="card-body">
-        <Link to={"/user/" + _id["$oid"]}><img className="profile" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
-        <h4>{name}</h4>
+        <Link to={"/user/" + _id["$oid"]}><img className="friend" src={"https://graph.facebook.com/" + id + "/picture?type=normal"}/></Link>
+        <br/>
+        <h4 style={{textAlign: "center"}}>{name}</h4>
+        <br/>
+        <p style={{textAlign: "center"}}>"{status}"</p>
       </div></div></div>
     });
 
