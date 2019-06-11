@@ -549,11 +549,11 @@ class Comments extends React.Component {
        </tr>);
 
       const top3pos = article.top3pos.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
-      <div className={"circle" + (parseInt(index)+1)}>{statement}</div>
+      <div className={"circle" + (parseInt(index)+1)} dangerouslySetInnerHTML={{ __html:"<i>'" + statement+ "'</i> - " + this.getFirstName(user[0].name)}}></div>
       );
 
       const top3neg = article.top3neg.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
-      <div className={"circle" + (parseInt(index)+1)}>{statement}</div>
+      <div className={"circle" + (parseInt(index)+1)} dangerouslySetInnerHTML={{ __html:"<i>'" + statement+ "'</i> - " + this.getFirstName(user[0].name)}}></div>
       );
 
     return <div className="container">
