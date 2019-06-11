@@ -185,7 +185,7 @@ def get_comments():
     print(content)
     article_id = ObjectId(content["article_id"])
     against = content["against"]
-    return jsonify(db.comments.find({"article_id": article_id, "against": against}))
+    return jsonify(db.comments.aggregate([{"$match": {"article_id": article_id, "against": against}}, {"$sample" : {"size": 5}}]))
 
 @app.route("/api/thumbs_up", methods=['POST'])
 def thumbs_up():
