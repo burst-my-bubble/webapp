@@ -334,7 +334,13 @@ class Profile extends React.Component {
     if (new Date(this.state.data2.streak.last_time["$date"]) > TWO_DAYS) {
       streak = this.state.data2.streak.length;
     }
-
+    var button = null;
+      console.log(this.props.myid);
+      console.log(this.props._id);
+    if (this.props.myid["$oid"] === this.props._id["$oid"]) {
+      console.log("yoooooo");
+      button = <button onClick={() => this.setState({show: true})}>Edit</button>
+    }
     return <div className="container">
 <br/>
  <div className="row">
@@ -344,10 +350,9 @@ class Profile extends React.Component {
         <br/><br/>
         <h2 style={{textAlign:"center"}}>{this.state.data2["name"]}</h2>
         <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
-        <p style={{textAlign:"center"}}>"{this.state.data2.status}" <button onClick={() => this.setState({show: true})}>Edit</button></p>
+        <p style={{textAlign:"center"}}>"{this.state.data2.status}" {button} </p>
      </div>
      <br/>
-
      <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>Edit Status</Modal.Title>
