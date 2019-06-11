@@ -452,13 +452,18 @@ class Comments extends React.Component {
       });
     });
   }
+  
 
   render() {
-
     if (!this.state.loaded) {
       return null;
     }
     var article = this.state.data;
+    console.log(article.published_date);
+    var dstr = "No Date";
+     if(article.published_date != null){
+       dstr = new Date(article.published_date.$date).toDateString();
+     }
     return <div className="container">
 
       <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
@@ -470,10 +475,9 @@ class Comments extends React.Component {
               <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
             </p>
             <p>
-              {article.description}
+              <div className="no_img" dangerouslySetInnerHTML={{ __html: article.description }} />
             </p>
-            <span className="label badge badge-primary badge-primary">{new Date(article.published_date.$date).toDateString()}</span>
-          </div>
+            <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
 
     </div>;
