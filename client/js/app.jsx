@@ -484,6 +484,7 @@ class Comments extends React.Component {
     super(props);
     this.onToggle = this.onToggle.bind(this);
     this.state = {
+      likedComms:[],
       message: "",
       placeholder:"Share your best reason for supporting or opposing this article",
       toggleActive: true,
@@ -521,8 +522,10 @@ class Comments extends React.Component {
 
   thumbs_up(id) {
     console.log(id);
-    axios.post(SERVER_URI + "api/thumbs_up", {comment_id:id});
-    this.render();
+    if(!this.state.likedComms.includes(id)){
+      axios.post(SERVER_URI + "api/thumbs_up", {comment_id:id});
+      this.state.likedComms.push(id);
+    }
   }
 
   getFirstName(name) {
@@ -545,8 +548,7 @@ class Comments extends React.Component {
        <tr key={_id["$oid"]}>
          <td>{statement}</td>
          <td>{this.getFirstName(user[0].name)}</td>
-         <td>{thumbs_up}</td>
-         <td><p onClick={() => this.thumbs_up(_id)}>👍</p></td>
+         <td><p id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
        </tr>);
 
     console.log(article.negComments);
@@ -554,8 +556,7 @@ class Comments extends React.Component {
        <tr key={_id["$oid"]}>
          <td>{statement}</td>
          <td>{this.getFirstName(user[0].name)}</td>
-         <td>{thumbs_up}</td>
-         <td><p onClick={() => this.thumbs_up(_id)}>👍</p></td>
+         <td><p id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
        </tr>);
 
     return <div className="container">
@@ -574,8 +575,32 @@ class Comments extends React.Component {
             <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
         <br></br>
+
+
+        <div className="outertable">
+          <div className="floatLeft">
+            <p style={{textAlign:"center"}}>Supporting Comments</p>
+            <table className="table table-bordered">
+              <tbody>
+                {posComments}
+              </tbody>
+            </table>
+          </div>
+          <div className="floatRight">
+          <p style={{textAlign:"center"}}>Opposing Comments</p>
+            <table className="table table-bordered">
+              <tbody>
+                {negComments}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <br></br>
+
+
         <div className="form-group">
-          <label htmlFor="comment">Your Opinion:</label>
+          <label htmlFor="comment">Add Your Own Opinion:</label>
           <textarea className="form-control" rows="5" id="comment" onChange={(e) => this.handleChange(e)} value={this.state.message} placeholder={this.state.placeholder}></textarea>
         </div>
         <Toggle
@@ -593,19 +618,6 @@ class Comments extends React.Component {
         <button className="btn btn-secondary" onClick={() => this.submitComment()}>Submit</button>
 
         <br/>
-        <table className="table table-bordered">
-          <tbody>
-            {posComments}
-          </tbody>
-        </table>
-
-        <br/>
-        <table className="table table-bordered">
-          <tbody>
-            {negComments}
-          </tbody>
-        </table>
-
     </div>;
 
   }
