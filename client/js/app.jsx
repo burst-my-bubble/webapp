@@ -6,6 +6,7 @@ import CalendarHeatmap from 'react-calendar-heatmap';
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import cloud from "d3-cloud";
 import * as d3 from "d3";
+import Toggle from 'react-bootstrap-toggle';
 
 class Login extends React.Component {
   render() {
@@ -441,7 +442,9 @@ class Profile extends React.Component {
 class Comments extends React.Component {
   constructor(props) {
     super(props);
+    this.onToggle = this.onToggle.bind(this);
     this.state = {
+      toggleActive: true,
       loaded: false,
       dropdown: ""
     };
@@ -453,6 +456,15 @@ class Comments extends React.Component {
     });
   }
   
+  onToggle() {
+    this.setState({ toggleActive: !this.state.toggleActive });
+  }
+
+  submitComment(){
+    //post to comment endpoint
+    // 
+    console.log("hi");
+  }
 
   render() {
     if (!this.state.loaded) {
@@ -480,8 +492,28 @@ class Comments extends React.Component {
             <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
 
+        <div className="form-group">
+          <label htmlFor="comment">Your Opinion:</label>
+          <textarea className="form-control" rows="5" id="comment" placeholder="Share your best reason for supporting or opposing this article"></textarea>
+        </div>
+        <Toggle
+          onClick={this.onToggle}
+          on={<h2 style={{fontSize:"16px", paddingRight:"13px"}} className="rightalign">Support</h2>}
+          off={<h2 style={{fontSize:"16px", paddingLeft:"13px"}} className="rightalign">Oppose</h2>}
+          size="xs"
+          onstyle="success"
+          offstyle="danger"
+          handlestyle="default"
+          active={this.state.toggleActive}
+          width={100}
+          height={38}
+        />
+        <button className="btn btn-secondary" onClick={() => this.submitComment()}>Submit</button>
+
     </div>;
+
   }
+
 
 }
 
