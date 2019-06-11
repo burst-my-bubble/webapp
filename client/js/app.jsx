@@ -339,7 +339,8 @@ class Profile extends React.Component {
       console.log(this.props._id);
     if (this.props.myid["$oid"] === this.props._id["$oid"]) {
       console.log("yoooooo");
-      button = <button onClick={() => this.setState({show: true})}>Edit</button>
+      button = <button className="btn btn-link" onClick={() => this.setState({show: true})}>
+        <img src="/edit_icon.svg"/></button>
     }
     return <div className="container">
 <br/>
