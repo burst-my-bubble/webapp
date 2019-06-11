@@ -565,6 +565,14 @@ class Comments extends React.Component {
          <td><p id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
        </tr>);
 
+      const top3pos = article.top3pos.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
+      <div className={"circle" + (parseInt(index)+1)}>{statement}</div>
+      );
+
+      const top3neg = article.top3neg.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
+      <div className={"circle" + (parseInt(index)+1)}>{statement}</div>
+      );
+
     return <div className="container">
 
       <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
@@ -581,6 +589,11 @@ class Comments extends React.Component {
             <span className="label badge badge-primary badge-primary">{dstr}</span>          </div>
         </div>
         <br></br>
+        <div>
+              {top3pos}
+              <br></br>
+              {top3neg}
+        </div>
 
 
         <div className="outertable">

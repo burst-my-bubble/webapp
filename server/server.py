@@ -204,6 +204,8 @@ def get_article():
     article = db.articles.find_one({"_id": article_id})
     article["negComments"] = list(db.comments.aggregate([{"$match": {"article_id": article_id, "against": True}}, {"$sample" : {"size": 5}}, {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "user"}}]))
     article["posComments"] = list(db.comments.aggregate([{"$match": {"article_id": article_id, "against": False}}, {"$sample" : {"size": 5}}, {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "user"}}]))
+    article["top3pos"] = list(db.comments.aggregate([{"$match": {"article_id": article_id, "against": False}}, {"$sort" : {"thumbs_up": -1}}, {"$limit" : 3}, {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "user"}}]))
+    article["top3neg"] = list(db.comments.aggregate([{"$match": {"article_id": article_id, "against": True}}, {"$sort" : {"thumbs_up": -1}}, {"$limit" : 3}, {"$lookup": {"from": "users", "localField": "user_id", "foreignField": "_id", "as": "user"}}]))   
     return jsonify(article)
 
 @app.route("/api/get_name", methods=['POST'])
