@@ -453,6 +453,7 @@ class Comments extends React.Component {
     this.onToggle = this.onToggle.bind(this);
     this.state = {
       message: "",
+      placeholder:"Share your best reason for supporting or opposing this article",
       toggleActive: true,
       loaded: false,
       dropdown: ""
@@ -480,16 +481,20 @@ class Comments extends React.Component {
     console.log(this.state.message);
     console.log(!this.state.toggleActive);
 
-    axios.post(SERVER_URI + "api/comment", {user_id:this.props._id, article_id:this.props.aid, against:!this.state.toggleActive, statement:this.state.message})
+    axios.post(SERVER_URI + "api/comment", {user_id:this.props._id, article_id:this.props.aid, against:!this.state.toggleActive, statement:this.state.message});
+    this.setState({placeholder: "Thank you for submitting your comment! If you would like to override it with a new one, please just submit again"});
+    this.setState({message: ""});
+
   }
 
   render() {
     if (!this.state.loaded) {
       return null;
     }
+
     var article = this.state.data;
     var dstr = "No Date";
-     if(article.published_date != null){
+    if(article.published_date != null){
        dstr = new Date(article.published_date.$date).toDateString();
      }
     return <div className="container">
@@ -510,7 +515,7 @@ class Comments extends React.Component {
         <br></br>
         <div className="form-group">
           <label htmlFor="comment">Your Opinion:</label>
-          <textarea className="form-control" rows="5" id="comment" onChange={(e) => this.handleChange(e)} placeholder="Share your best reason for supporting or opposing this article"></textarea>
+          <textarea className="form-control" rows="5" id="comment" onChange={(e) => this.handleChange(e)} value={this.state.message} placeholder={this.state.placeholder}></textarea>
         </div>
         <Toggle
           onClick={this.onToggle}

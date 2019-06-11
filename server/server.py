@@ -176,7 +176,7 @@ def comment():
     against = content["against"]
     statement = content["statement"]
     print(user_id, article_id, against, statement)
-    db.comments.insert({"user_id": user_id, "article_id": article_id, "against": against, "statement": statement, "thumbs_up": 0})
+    db.comments.update({"user_id": user_id, "article_id": article_id}, {"user_id": user_id, "article_id": article_id, "against": against, "statement": statement, "thumbs_up": 0}, upsert=True)
     return jsonify({})
 
 @app.route("/api/get_comments", methods=['POST'])
