@@ -524,6 +524,16 @@ class Comments extends React.Component {
 
   }
 
+  thumbs_up(id) {
+    console.log(id);
+    axios.post(SERVER_URI + "api/thumbs_up", {comment_id:id});
+    this.render();
+  }
+
+  getFirstName(name) {
+    return name.split(" ")[0]
+  }
+
   render() {
     if (!this.state.loaded) {
       return null;
@@ -534,6 +544,25 @@ class Comments extends React.Component {
     if(article.published_date != null){
        dstr = new Date(article.published_date.$date).toDateString();
      }
+
+    console.log(article.posComments);
+     const posComments = article.posComments.map(({user_id, thumbs_up, against, statement, _id, article_id, user}) => 
+       <tr key={_id["$oid"]}>
+         <td>{statement}</td>
+         <td>{this.getFirstName(user[0].name)}</td>
+         <td>{thumbs_up}</td>
+         <td><p onClick={() => this.thumbs_up(_id)}>👍</p></td>
+       </tr>);
+
+    console.log(article.negComments);
+     const negComments = article.negComments.map(({user_id, thumbs_up, against, statement, _id, article_id, user}) => 
+       <tr key={_id["$oid"]}>
+         <td>{statement}</td>
+         <td>{this.getFirstName(user[0].name)}</td>
+         <td>{thumbs_up}</td>
+         <td><p onClick={() => this.thumbs_up(_id)}>👍</p></td>
+       </tr>);
+
     return <div className="container">
 
       <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
@@ -567,6 +596,20 @@ class Comments extends React.Component {
           height={38}
         />
         <button className="btn btn-secondary" onClick={() => this.submitComment()}>Submit</button>
+
+        <br/>
+        <table className="table table-bordered">
+          <tbody>
+            {posComments}
+          </tbody>
+        </table>
+
+        <br/>
+        <table className="table table-bordered">
+          <tbody>
+            {negComments}
+          </tbody>
+        </table>
 
     </div>;
 
