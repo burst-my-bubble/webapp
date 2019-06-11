@@ -165,6 +165,8 @@ class ProfileSources extends React.Component {
           <Sidebar myid={this.props.myid} _id ={this.props._id}/>
         </div>
       <div className="col-md-9">
+        <ProfileNav active={"Sources"}_id={this.props._id} />
+        <br/>
       <table className="table table-bordered">
         <tbody>
           {entries}
@@ -218,6 +220,8 @@ class ProfileCategories extends React.Component {
           <Sidebar myid={this.props.myid} _id ={this.props._id}/>
         </div>
         <div className="col-md-9">      
+        <ProfileNav active={"Categories"} _id={this.props._id} />
+        <br/>
         <table className="table table-bordered">
           <tbody>
             {entries}
@@ -226,6 +230,19 @@ class ProfileCategories extends React.Component {
         </div>
       </div>
     </div>
+  }
+}
+
+class ProfileNav extends React.Component {
+  render() {
+    return <div className="small-nav">
+     <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <Link to={"/user/" + this.props._id["$oid"]} className={"nav-link" + (this.props.active === "Summary"? " active": "")}>Summary</Link>
+          <Link to={"/user/" + this.props._id["$oid"] + "/categories"} className={"nav-link"+ (this.props.active === "Categories"? " active": "")}>Categories</Link>
+          <Link to={"/user/" + this.props._id["$oid"] + "/sources"} className={"nav-link"+ (this.props.active === "Sources"? " active": "")} >Sources</Link>
+          <Link to={"/user/" + this.props._id["$oid"] + "/archive"} className={"nav-link" + (this.props.active === "Archive"? " active": "")}>Archive</Link>
+        </div>
+     </div>
   }
 }
 
@@ -363,14 +380,7 @@ class Profile extends React.Component {
    <div className="col-md-9">
      <div className="row">
        <div className="col-md-12">
-       <div className="small-nav">
-     <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <Link to={"/user/" + this.props._id["$oid"]} className="nav-link active">Summary</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/categories"} className="nav-link">Categories</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/sources"} className="nav-link">Sources</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/archive"} className="nav-link">Archive</Link>
-        </div>
-     </div>
+        <ProfileNav active={"Summary"} _id={this.props._id}/>
      <br/>
        </div>
      
@@ -1063,7 +1073,7 @@ class Trending extends React.Component {
   }
 
   render() {
-    return <div id="Graph"></div>
+    return <div style={{marginTop: "60px"}}id="Graph"></div>
   }
 }
 
