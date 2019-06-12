@@ -1089,11 +1089,13 @@ class Trending extends React.Component {
         .attr("text-anchor", "middle")
         .on("click", (d)=> {window.location = "/trending/" + d.text})
         .on("mouseover", function(d) {
+            console.log(d)
             d3.select(this).node().parentNode.appendChild(this)
-            d3.select(this).transition().style('font-size', "80px")
+            d3.select(this).transition().style('font-size', d.size+30+"px")
         })
         .on("mouseout", function(d) {
-            d3.select(this).transition().style('font-size', this.size)
+          console.log(d.size)
+            d3.select(this).transition().style('font-size', d.size+ "px")
         })
         .attr("transform", function(d) {
           return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
