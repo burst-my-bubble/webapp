@@ -1037,6 +1037,10 @@ class Home extends React.Component {
 
 class Trending extends React.Component {
 
+  handleMouseOver(d) {
+    console.log(this)
+  }
+
   otherfunc(data){
     console.log(data)
     var words = data.map((x) => {return {text: x.name, size: x.score, test: "haha"}});
@@ -1079,6 +1083,13 @@ class Trending extends React.Component {
         .style("fill", () => d3.schemeCategory10[Math.floor(Math.random() * d3.schemeCategory10.length)])
         .attr("text-anchor", "middle")
         .on("click", (d)=> {window.location = "/trending/" + d.text})
+        .on("mouseover", function(d) {
+            d3.select(this).node().parentNode.appendChild(this)
+            d3.select(this).transition().style('font-size', "80px")
+        })
+        .on("mouseout", function(d) {
+            d3.select(this).transition().style('font-size', this.size)
+        })
         .attr("transform", function(d) {
           return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
         })
