@@ -579,7 +579,7 @@ class Comments extends React.Component {
         <div className="outertable" style={{padding:"8px"}}>
           
           <div className="floatLeft">
-          <div className="card article" style={{boxShadow:"5px 5px 5px grey", padding:"5px"}}>
+          <div className="card article" style={{boxShadow:"1px 1px 5px grey", padding:"5px"}}>
 
             <p style={{textAlign:"center"}}>Supporting Comments</p>
             <table className="table table-bordered">
@@ -590,7 +590,7 @@ class Comments extends React.Component {
             </div>
           </div>
           <div className="floatRight">
-          <div className="card article" style={{boxShadow:"5px 5px 5px grey", padding:"5px"}}>
+          <div className="card article" style={{boxShadow:"1px 1px 5px grey", padding:"5px"}}>
           <p style={{textAlign:"center"}}>Opposing Comments</p>
             <table className="table table-bordered">
               <tbody>
