@@ -405,7 +405,7 @@ class Profile extends React.Component {
     </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}><h1>{lastWeek.length}</h1></button> articles read this week. {topCategory} being {pronoun} favourite category.
+     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}><h1>{lastWeek.length}</h1></button> articles read this week and {topCategory} was {pronoun} favourite
       <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Categories</Modal.Title>
@@ -430,7 +430,7 @@ class Profile extends React.Component {
      </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1>{this.state.data.sources.length}</h1></button> different news sources read this week. {topSource} being {pronoun} favourite news source.
+     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1>{this.state.data.sources.length}</h1></button> different news sources read this week and {topSource} was {pronoun} top one
       <Modal show={this.state.show2} onHide={this.handleClose2.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Sources</Modal.Title>
