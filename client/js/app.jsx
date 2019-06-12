@@ -999,8 +999,13 @@ class Home extends React.Component {
             <p className="card-text">
               <a className="no-link" onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>{article.title}</a>
             </p>
-            <Link to={"/article/" + id + "/comments"} className="card-link">Opinions&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</Link>
+            <span className="label badge badge-primary badge-primary">
+              <Link to={"/article/" + id + "/comments"} style={{color:"white"}} className="card-link">Opinions</Link>
+            </span>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <span style={{color:this.getColour(article.sentiment)}}>◉</span>
+            <br/>
+            <br/>
             {tags}
             <span className="label badge badge-primary badge-primary">{dstr}</span>
           </div>
