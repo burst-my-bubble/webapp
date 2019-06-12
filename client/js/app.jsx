@@ -437,7 +437,7 @@ class Profile extends React.Component {
   toHtml(articles) {
     var result = articles.map(article => {
       return <tr key={article._id["$oid"]}>
-        <td><a href={article.url} target="_blank" onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
+        <td><a href={"/article/" + article._id["$oid"] + "/comments"} onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
     </tr>});
     return <table className="table table-sm table-bordered">
       <tbody>{result}</tbody>
