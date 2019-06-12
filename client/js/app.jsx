@@ -966,6 +966,11 @@ class Home extends React.Component {
       const tags = article.entities.map(e => {
         return <span key={e.displayName} className="label badge badge-secondary">{e.displayName}</span>;
       });
+      var dstr = "No Date";
+      if(article.published_date != null){
+         dstr = new Date(article.published_date.$date).toDateString();
+       }
+
       return <div className="col-md-3" key={id}>
         <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
@@ -978,7 +983,7 @@ class Home extends React.Component {
             <Link to={"/article/" + id + "/comments"} className="card-link">Opinions&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</Link>
             <span style={{color:this.getColour(article.sentiment)}}>◉</span>
             {tags}
-            <span className="label badge badge-primary badge-primary">{new Date(article.published_date.$date).toDateString()}</span>
+            <span className="label badge badge-primary badge-primary">{dstr}</span>
           </div>
         </div>
       </div>;
