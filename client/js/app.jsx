@@ -253,6 +253,10 @@ class Profile extends React.Component {
       this.loadData();
     }
   }
+  
+  getFirstName(name) {
+    return name.split(" ")[0]
+  }
 
   loadData() {
     var id = this.state.id;
@@ -277,9 +281,20 @@ class Profile extends React.Component {
     this.setState({show2: false});
   }
 
+
+
   render() {
     if (!this.state.loaded) {
       return null;
+    }
+    var readHistory = "";
+    var pronoun = "";
+    if (this.props.myid["$oid"] === this.props._id["$oid"]) {
+      readHistory = "What you've been reading recently";
+      pronoun = "your";
+    } else {
+      readHistory = "What " + this.getFirstName(this.state.data2["name"]) + "'s been reading recently";
+      pronoun = "their";
     }
     var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
@@ -388,7 +403,7 @@ class Profile extends React.Component {
     </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}><h1>{lastWeek.length}</h1></button> articles read this week. {topCategory} being your favourite category.
+     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}><h1>{lastWeek.length}</h1></button> articles read this week. {topCategory} being {pronoun} favourite category.
       <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Categories</Modal.Title>
@@ -413,7 +428,7 @@ class Profile extends React.Component {
      </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1>{this.state.data.sources.length}</h1></button> different news sources read this week. {topSource} being your favourite news source.
+     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1>{this.state.data.sources.length}</h1></button> different news sources read this week. {topSource} being {pronoun} favourite news source.
       <Modal show={this.state.show2} onHide={this.handleClose2.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Sources</Modal.Title>
@@ -443,7 +458,7 @@ class Profile extends React.Component {
   
       
 <br/>
-  <h4>What you've been reading recently</h4>
+  <h4>{readHistory}</h4>
   <div className="stat">
         {this.toHtml(history)}
   </div>
@@ -736,7 +751,7 @@ class Sidebar extends React.Component {
   <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data.id + "/picture?width=900"}/>
     <br/><br/>
     <h2 style={{textAlign:"center"}}>{this.state.data["name"]}</h2>
-    <p style={{textAlign:"center"}}>User since {joinDate.toDateString()}</p>
+    <p style={{textAlign:"center"}}>Bursting since {joinDate.toDateString().split(' ').slice(1).join(' ')}</p>
     <p style={{textAlign:"center"}}>"{this.state.data.status}" {button} </p>
   </div>
   <br/>
@@ -797,6 +812,7 @@ class Navbar extends React.Component {
       dropdown: this.state.dropdown === "" ? "show": ""
     });
   }
+
 
   mobileToggle() {
     this.setState({
