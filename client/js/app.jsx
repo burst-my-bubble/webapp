@@ -374,9 +374,7 @@ class Profile extends React.Component {
    </div>
    <div className="col-md-9">
      <div className="row">
-       <div className="col-md-12">
-       </div>
-     
+    
    <div className="col-md-4">
      <div className="card stat"><p style={{fontSize: "30px"}}>{streak} day streak</p>    
      <br/>
@@ -439,20 +437,28 @@ class Profile extends React.Component {
         <Tooltip />
       </PieChart>
      </div>
-
    </div>
+    
    </div>
   
       
 <br/>
-  <div className="stat">
   <h4>What you've been reading recently</h4>
+  <div className="stat">
         {this.toHtml(history)}
   </div>
         
-    </div>
-    </div>
+    <br/>
+    <h4 style={{textAlign: "center"}}>Your top comments</h4>
+    <br/>
+    <div className="col-md-12" >
+        <div className="circle1">Cogito ergo sum</div>
+        <div className="circle2">Et tu Brute?</div>
+        <div className="circle3">Cool cool cool</div>
+       </div>
 
+    </div>
+    </div>
 </div>;
   }
 
