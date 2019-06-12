@@ -187,6 +187,12 @@ def get_comments():
     against = content["against"]
     return jsonify(db.comments.aggregate([{"$match": {"article_id": article_id, "against": against}}, {"$sample" : {"size": 5}}]))
 
+@app.route("/api/get_user_comments", methods=['POST'])
+def get_user_comments():
+    content =  request.json
+    user_id = ObjectId(content["user_id"]["$oid"])
+    return 
+
 @app.route("/api/thumbs_up", methods=['POST'])
 def thumbs_up():
     content = request.json
@@ -393,7 +399,9 @@ def all_articles_source_cats():
     content = request.json
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
-    return jsonify(list(
+    top_comments = list(db.comments.find({"user_id": user_id}).sort([("thumbs_up", -1)]).limit(3))
+    print(top_comments)
+    x = list(
         db.users.aggregate([{
             "$match": {
                 "_id": user_id 
@@ -510,7 +518,9 @@ def all_articles_source_cats():
                                 "$arrayElemAt": ["$src_id.title", 0]
                             }
                         }}
-                ]}}]))[0])
+                ]}}]))[0]
+    x["top_comments"] = top_comments
+    return jsonify(x)
             
 
 @app.route("/api/categories", methods=['POST'])
