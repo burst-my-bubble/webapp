@@ -277,9 +277,17 @@ class Profile extends React.Component {
     this.setState({show2: false});
   }
 
+
+
   render() {
     if (!this.state.loaded) {
       return null;
+    }
+    var readHistory = "";
+    if (this.props.myid["$oid"] === this.props._id["$oid"]) {
+      readHistory = "What you've been reading recently";
+    } else {
+      readHistory = "What " + this.state.data["name"] + "'s been reading recently";
     }
     var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
@@ -446,7 +454,7 @@ class Profile extends React.Component {
       
 <br/>
   <div className="stat">
-  <h4>What you've been reading recently</h4>
+  <h4>{readHistory}</h4>
         {this.toHtml(history)}
   </div>
         
