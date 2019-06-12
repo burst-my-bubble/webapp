@@ -253,6 +253,10 @@ class Profile extends React.Component {
       this.loadData();
     }
   }
+  
+  getFirstName(name) {
+    return name.split(" ")[0]
+  }
 
   loadData() {
     var id = this.state.id;
@@ -803,9 +807,6 @@ class Navbar extends React.Component {
     });
   }
 
-  getFirstName(name) {
-    return name.split(" ")[0]
-  }
 
   mobileToggle() {
     this.setState({
