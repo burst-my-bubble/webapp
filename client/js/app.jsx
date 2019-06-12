@@ -146,13 +146,6 @@ class ProfileSources extends React.Component {
       return null;
     }
 
-    const entries = this.state.data.sort((a, b) => {
-      return b.count - a.count
-    }).map(({_id, title, count}) => 
-      <tr key={_id["$oid"]}>
-        <td>{title}</td>
-        <td>{count}</td>
-      </tr>);
 
     const data = this.state.data.map(({title, count}) => {
       return {name: title, value: count};
@@ -205,14 +198,6 @@ class ProfileCategories extends React.Component {
       return null;
     }
 
-    const entries = this.state.data.sort((a, b) => {
-      return b.count - a.count
-    }).map(({_id, title, count}) => 
-      <tr key={_id["$oid"]}>
-        <td>{title}</td>
-        <td>{count}</td>
-      </tr>);
-
     return <div className="container">
       <br/>
       <div className="row">
@@ -222,11 +207,6 @@ class ProfileCategories extends React.Component {
         <div className="col-md-9">      
         <ProfileNav active={"Categories"} _id={this.props._id} />
         <br/>
-        <table className="table table-bordered">
-          <tbody>
-            {entries}
-          </tbody>
-        </table>
         </div>
       </div>
     </div>
@@ -236,11 +216,10 @@ class ProfileCategories extends React.Component {
 class ProfileNav extends React.Component {
   render() {
     return <div className="small-nav">
-     <div className="nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+     <div className="nav flex-column" id="v-pills-tab" role="tablist" aria-orientation="vertical">
           <Link to={"/user/" + this.props._id["$oid"]} className={"nav-link" + (this.props.active === "Summary"? " active": "")}>Summary</Link>
           <Link to={"/user/" + this.props._id["$oid"] + "/categories"} className={"nav-link"+ (this.props.active === "Categories"? " active": "")}>Categories</Link>
           <Link to={"/user/" + this.props._id["$oid"] + "/sources"} className={"nav-link"+ (this.props.active === "Sources"? " active": "")} >Sources</Link>
-          <Link to={"/user/" + this.props._id["$oid"] + "/archive"} className={"nav-link" + (this.props.active === "Archive"? " active": "")}>Archive</Link>
         </div>
      </div>
   }
@@ -251,7 +230,8 @@ class Profile extends React.Component {
     super();
     this.state = {
       loaded: false,
-      show: false 
+      show: false,
+      show2: false 
     }; 
   }
 
@@ -289,7 +269,13 @@ class Profile extends React.Component {
     });
   }
 
+  handleClose() {
+    this.setState({show: false});
+  }
 
+  handleClose2() {
+    this.setState({show2: false});
+  }
 
   render() {
     if (!this.state.loaded) {
@@ -322,6 +308,22 @@ class Profile extends React.Component {
       }
       map[m]++;
     });
+
+    const entriesCategories = this.state.data.categories.sort((a, b) => {
+      return b.count - a.count
+    }).map(({_id, title, count}) => 
+      <tr key={_id["$oid"]}>
+        <td>{title}</td>
+        <td>{count}</td>
+      </tr>);
+
+    const entriesSources = this.state.data.sources.sort((a, b) => {
+      return b.count - a.count
+    }).map(({_id, title, count}) => 
+      <tr key={_id["$oid"]}>
+        <td>{title}</td>
+        <td>{count}</td>
+      </tr>);
 
     var tMap = Object.entries(map).map(a => {
       return { date: a[0], count: a[1] };
@@ -373,8 +375,6 @@ class Profile extends React.Component {
    <div className="col-md-9">
      <div className="row">
        <div className="col-md-12">
-        <ProfileNav active={"Summary"} _id={this.props._id}/>
-     <br/>
        </div>
      
    <div className="col-md-4">
@@ -390,7 +390,20 @@ class Profile extends React.Component {
     </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/categories"}>{lastWeek.length}</Link></h1> articles read this week. {topCategory} being your favourite category.
+     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}><h1>{lastWeek.length}</h1></button> articles read this week. {topCategory} being your favourite category.
+      <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
+          <Modal.Header closeButton>
+            <Modal.Title>View Categories</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <table className="table table-bordered">
+              <tbody>
+                {entriesCategories}
+              </tbody>
+            </table>
+
+          </Modal.Body>
+        </Modal>
      <PieChart width={200} height={200}>
         <Pie dataKey="value"  isAnimationActive={false} data={data2} cx={100} cy={100} outerRadius={80} fill="#8884d8">
         {
@@ -402,7 +415,20 @@ class Profile extends React.Component {
      </div>
    </div>
    <div className="col-md-4">
-   <div className="card stat"><h1><Link to={"/user/" + this.props._id["$oid"] + "/sources"}>{this.state.data.sources.length}</Link></h1> different news sources read this week. {topSource} being your favourite news source.
+     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1>{this.state.data.sources.length}</h1></button> different news sources read this week. {topSource} being your favourite news source.
+      <Modal show={this.state.show2} onHide={this.handleClose2.bind(this)}>
+          <Modal.Header closeButton>
+            <Modal.Title>View Sources</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <table className="table table-bordered">
+              <tbody>
+                {entriesSources}
+              </tbody>
+            </table>
+
+          </Modal.Body>
+        </Modal>
      
      <PieChart width={200} height={200}>
         <Pie dataKey="value"  isAnimationActive={false} data={data} cx={100} cy={100} outerRadius={80} fill="#8884d8">
