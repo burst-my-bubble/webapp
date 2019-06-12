@@ -287,7 +287,7 @@ class Profile extends React.Component {
     if (this.props.myid["$oid"] === this.props._id["$oid"]) {
       readHistory = "What you've been reading recently";
     } else {
-      readHistory = "What " + this.state.data2["name"] + "'s been reading recently";
+      readHistory = "What " + this.getFirstName(this.state.data2["name"]) + "'s been reading recently";
     }
     var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
@@ -798,6 +798,10 @@ class Navbar extends React.Component {
     this.setState({
       dropdown: this.state.dropdown === "" ? "show": ""
     });
+  }
+
+  getFirstName(name) {
+    return name.split(" ")[0]
   }
 
   mobileToggle() {
