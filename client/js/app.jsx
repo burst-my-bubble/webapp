@@ -796,6 +796,7 @@ class Navbar extends React.Component {
       <div className={"navbar-collapse " + this.state.mobileDropdown}>
       <ul className="navbar-nav mr-auto mt-2 mt-lg-0">
         <li className="nav-item"><Link className="nav-link ikaros" to={"/trending"}>Trending</Link></li>
+        <li className="nav-item d-none d-lg-block nav-link ikaros">|</li>
        {categories}
       </ul>
       </div>   
