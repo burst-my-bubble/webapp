@@ -277,9 +277,7 @@ class Profile extends React.Component {
   loadData() {
     var id = this.state.id;
     axios.post(SERVER_URI + "api/all_articles_sources_cats", {user_id: id}).then(({data}) => {
-      console.log("helloao");
       axios.post(SERVER_URI + "api/get_name", {user_id: id}).then((a) => {
-        console.log("tester");
         this.setState({
           loaded: true,
           data: data,
@@ -297,7 +295,6 @@ class Profile extends React.Component {
     if (!this.state.loaded) {
       return null;
     }
-    console.log(this.state.data);
     var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
     ).map(a => Object.assign({}, a, {access_time: new Date(a.access_time["$date"])}));
@@ -307,11 +304,7 @@ class Profile extends React.Component {
     TODAY_365.setDate(TODAY.getDate() - 100);
 
     var lastWeek = articles.filter(a => this.daysBetween(a.access_time, TODAY) <= 7);
-    var today = lastWeek.filter(a => this.sameDay(a.access_time, TODAY));
-    var notTodayButLastWeek = lastWeek.filter(a => !this.sameDay(a.access_time, TODAY));
-    var lastMonth = articles.filter(a => this.daysBetween(a.access_time, TODAY) > 7);
-
-
+    var history = lastWeek.slice(0, 10);
     var map = {};
     articles.forEach(a => {
       var t = a.access_time;
@@ -385,7 +378,7 @@ class Profile extends React.Component {
        </div>
      
    <div className="col-md-4">
-     <div className="card stat"><p style={{fontSize: "30px"}}>{streak} day streak.</p>    
+     <div className="card stat"><p style={{fontSize: "30px"}}>{streak} day streak</p>    
      <br/>
       <table style={{fontSize: "20px"}}>
         <tr><td>1</td><td><img src="https://graph.facebook.com/834147103608464/picture?type=small"/></td><td>Hashan</td><td>200</td></tr>
@@ -427,12 +420,8 @@ class Profile extends React.Component {
       
 <br/>
   <div className="stat">
-  <h4>Today</h4>
-        {this.toHtml(today)}
-        <h4>Last Week</h4>
-        {this.toHtml(notTodayButLastWeek)}
-        <h4>Last Month</h4>
-        {this.toHtml(lastMonth)}
+  <h4>What you've been reading recently</h4>
+        {this.toHtml(history)}
   </div>
         
     </div>
@@ -1002,7 +991,7 @@ class Home extends React.Component {
        }
 
       return <div className="col-md-3" key={id}>
-        <div className="card article" style={{boxShadow:"5px 5px 5px grey"}}>
+        <div className="card article" style={{boxShadow:"1px 1px 5px grey"}}>
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
             <img src={article.image_url} className="card-img-top"/>
           </a>
@@ -1072,6 +1061,10 @@ class Home extends React.Component {
 
 class Trending extends React.Component {
 
+  handleMouseOver(d) {
+    console.log(this)
+  }
+
   otherfunc(data){
     console.log(data)
     var words = data.map((x) => {return {text: x.name, size: x.score, test: "haha"}});
@@ -1114,6 +1107,14 @@ class Trending extends React.Component {
         .style("fill", () => d3.schemeCategory10[Math.floor(Math.random() * d3.schemeCategory10.length)])
         .attr("text-anchor", "middle")
         .on("click", (d)=> {window.location = "/trending/" + d.text})
+        .on("mouseover", function(d) {
+            console.log(d)
+            d3.select(this).node().parentNode.appendChild(this)
+            d3.select(this).transition().style('font-size', d.size+30+"px")
+        })
+        .on("mouseout", function(d) {
+            d3.select(this).transition().style('font-size', d.size+ "px")
+        })
         .attr("transform", function(d) {
           return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
         })
