@@ -323,6 +323,9 @@ return <div className="card">
     if (!this.state.loaded) {
       return null;
     }
+    var TWO_DAYS = new Date();
+    TWO_DAYS.setDate(TWO_DAYS.getDate() - 2);
+
     var streak = 0;
     if (new Date(this.state.data2.streak.last_time["$date"]) > TWO_DAYS) {
       streak = this.state.data2.streak.length;
@@ -405,8 +408,6 @@ return <div className="card">
       return {name: title, value: count};
     });
 
-    var TWO_DAYS = new Date();
-    TWO_DAYS.setDate(TWO_DAYS.getDate() - 2);
 
     return <div className="container">
 <br/>
