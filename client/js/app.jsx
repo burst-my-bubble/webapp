@@ -282,6 +282,19 @@ class Profile extends React.Component {
   }
 
 
+  topComments() {
+    var comments = this.state.data.top_comments;
+    if (comments[0] == null || comments[1] == null || comments[2] == null){
+      return;
+    }
+    return <div><h4 style={{textAlign: "center"}}>Your top comments</h4><br/>
+    <div className="col-md-12" >
+        <div className="circle1">{this.state.data.top_comments[0].statement}</div>
+        <div className="circle2">{this.state.data.top_comments[1].statement}</div>
+        <div className="circle3">{this.state.data.top_comments[2].statement}</div>
+    </div></div>;
+  }
+
 
   render() {
     if (!this.state.loaded) {
@@ -464,14 +477,7 @@ class Profile extends React.Component {
   </div>
         
     <br/>
-    <h4 style={{textAlign: "center"}}>Your top comments</h4>
-    <br/>
-    <div className="col-md-12" >
-        <div className="circle1">{this.state.data.top_comments[0].statement}</div>
-        <div className="circle2">{this.state.data.top_comments[1].statement}</div>
-        <div className="circle3">{this.state.data.top_comments[2].statement}</div>
-       </div>
-
+    {this.topComments()}
     </div>
     </div>
 </div>;
