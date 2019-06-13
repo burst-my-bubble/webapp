@@ -323,6 +323,11 @@ return <div className="card">
     if (!this.state.loaded) {
       return null;
     }
+    var streak = 0;
+    if (new Date(this.state.data2.streak.last_time["$date"]) > TWO_DAYS) {
+      streak = this.state.data2.streak.length;
+    }
+
     var readHistory = "";
     var pronoun = "";
     var n = "";
@@ -331,12 +336,12 @@ return <div className="card">
       readHistory = "What you've been reading recently";
       pronoun = "your";
       n = "your"
-      streak_msg = "You're on a " + streak + "day streak Keep it up!"
+      streak_msg = "You're on a " + streak + " day streak Keep it up!"
     } else {
       readHistory = "What " + this.getFirstName(this.state.data2["name"]) + "'s been reading recently";
       pronoun = "their";
       n = this.getFirstName(this.state.data2["name"]) + "'s"
-      streak_msg =  this.getFirstName(this.state.data2["name"]) + "'s on a " + streak + "day streak!"
+      streak_msg =  this.getFirstName(this.state.data2["name"]) + "'s on a " + streak + " day streak!"
     }
     var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
@@ -403,10 +408,6 @@ return <div className="card">
     var TWO_DAYS = new Date();
     TWO_DAYS.setDate(TWO_DAYS.getDate() - 2);
 
-    var streak = 0;
-    if (new Date(this.state.data2.streak.last_time["$date"]) > TWO_DAYS) {
-      streak = this.state.data2.streak.length;
-    }
     return <div className="container">
 <br/>
  <div className="row">
@@ -426,7 +427,7 @@ return <div className="card">
     return `color-github-${Math.min(4, value.count)}`;
   }}
 />
-    <div className="card-body" style={{padding: "1em", textAlign: "center"}}>You're on a {streak} day streak Keep it up!</div>
+    <div className="card-body" style={{padding: "1em", textAlign: "center"}}>{streak_msg}</div>
      </div>
      
    </div></div>
