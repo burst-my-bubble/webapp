@@ -467,9 +467,9 @@ class Profile extends React.Component {
     <h4 style={{textAlign: "center"}}>Your top comments</h4>
     <br/>
     <div className="col-md-12" >
-        <div className="circle1">Cogito ergo sum</div>
-        <div className="circle2">Et tu Brute?</div>
-        <div className="circle3">Cool cool cool</div>
+        <div className="circle1">{this.state.data.top_comments[0].statement}</div>
+        <div className="circle2">{this.state.data.top_comments[1].statement}</div>
+        <div className="circle3">{this.state.data.top_comments[2].statement}</div>
        </div>
 
     </div>
