@@ -408,11 +408,10 @@ return <div className="card">
   endDate={TODAY}
   values={tMap}
   classForValue={(value) => {
-    console.log(value);
     if (!value) {
       return 'color-empty';
     }
-    return `color-scale-${value.count}`;
+    return `color-github-${Math.min(4, value.count)}`;
   }}
 />
     <div className="card-body" style={{padding: "1em", textAlign: "center"}}>You're on a {streak} day streak Keep it up!</div>
