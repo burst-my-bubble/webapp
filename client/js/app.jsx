@@ -555,6 +555,12 @@ class Comments extends React.Component {
     return name.split(" ")[0]
   }
 
+  markAsRead(id) {
+    axios.post(SERVER_URI + "api/read", {user_id: this.props._id, article_id: id}).then(() => {
+      console.log("sent");
+    });
+  }
+
   render() {
     if (!this.state.loaded) {
       return null;
