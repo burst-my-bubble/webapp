@@ -291,19 +291,19 @@ return <div className="card">
     <div className="card-header" style={{textAlign: "center"}}>Your top comments</div>
       <ul className="list-group">
         <li className="list-group-item">
-          <blockquote className="blockquote text-right">
+          <blockquote className="blockquote text-right" style={{marginBottom: "0"}}>
             <p className="mb-0">{this.state.data.top_comments[0].statement}</p>
             <footer className="blockquote-footer">from <i><Link to={"/article/"+ comments[0].article_id["$oid"] + "/comments"}>{comments[0].title}</Link></i></footer>
           </blockquote>
         </li>
         <li className="list-group-item text-right">
-          <blockquote className="blockquote">
+          <blockquote className="blockquote"style={{marginBottom: "0"}}>
             <p className="mb-0">{this.state.data.top_comments[1].statement}</p>
             <footer className="blockquote-footer">from <i><Link to={"/article/"+ comments[1].article_id["$oid"] + "/comments"}>{comments[1].title}</Link></i></footer>
           </blockquote>
         </li>
-        <li className="list-group-item text-right">
-          <blockquote className="blockquote">
+        <li className="list-group-item text-right" >
+          <blockquote className="blockquote"style={{marginBottom: "0"}}>
             <p className="mb-0">{this.state.data.top_comments[2].statement}</p>
             <footer className="blockquote-footer">from <i><Link to={"/article/"+ comments[2].article_id["$oid"] + "/comments"}>{comments[2].title}</Link></i></footer>
           </blockquote>
@@ -637,13 +637,13 @@ class Comments extends React.Component {
        </tr>);
     }
 
-      const top3pos = article.top3pos.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
+      const top3pos = <div style = {{display: "flex", flexDirection: "row", justifyContent: "center",}}>{article.top3pos.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
       <div className={"circle" + (parseInt(index)+1)} dangerouslySetInnerHTML={{ __html:"<i>'" + statement+ "'</i> - " + this.getFirstName(user[0].name)}}></div>
-      );
+      )}</div>
 
-      const top3neg = article.top3neg.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
+      const top3neg = <div style = {{display: "flex", flexDirection: "row", justifyContent: "center"}}>{article.top3neg.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
       <div className={"circle" + (parseInt(index)+1)} dangerouslySetInnerHTML={{ __html:"<i>'" + statement+ "'</i> - " + this.getFirstName(user[0].name)}}></div>
-      );
+      )}</div>
 
     return <div className="container">
 
@@ -701,7 +701,7 @@ class Comments extends React.Component {
 
 
         <h4>Read the most convincing arguments</h4>
-        <div>
+        <div style={{display: "block", margin: "auto"}}>
               <h5 className="left">For...</h5>
               {top3pos}
               <br></br>
