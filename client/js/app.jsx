@@ -411,7 +411,7 @@ return <div className="card">
     if (!value) {
       return 'color-empty';
     }
-    return `color-github-${Math.min(5, value.count)}`;
+    return `color-github-${Math.min(4, value.count)}`;
   }}
 />
     <div className="card-body" style={{padding: "1em", textAlign: "center"}}>You're on a {streak} day streak Keep it up!</div>
