@@ -383,8 +383,9 @@ class Profile extends React.Component {
  <div className="row">
    <div className="col-md-3">
        <Sidebar id={this.props.id} _id={this.props._id} myid={this.props.myid}/>
-
-     <div className="stat">
+       <br/>
+     <div className="card">
+       <div className="card-body">
      <CalendarHeatmap
   startDate={TODAY_365}
   endDate={TODAY}
@@ -400,7 +401,7 @@ class Profile extends React.Component {
     <div className="card-body" style={{padding: "1em", textAlign: "center"}}>You're on a {streak} day streak Keep it up!</div>
      </div>
      
-   </div>
+   </div></div>
    <div className="col-md-9">
      <div className="row">
    <div className="col-md-4">
@@ -778,7 +779,8 @@ class Sidebar extends React.Component {
     var joinDate = new Date(this.state.data["joined"].$date);
 
     return <div>
-  <div className="sidebar stat">
+  <div className="card">
+    <div className="card-body">
   <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data.id + "/picture?width=900"}/>
     <br/><br/>
     <h2 style={{textAlign:"center"}}>{this.state.data["name"]}</h2>
@@ -802,7 +804,7 @@ class Sidebar extends React.Component {
         </Button>
       </Modal.Footer>
     </Modal>
-    </div>
+    </div></div>
 }
 }
 
