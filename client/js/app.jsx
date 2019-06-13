@@ -287,12 +287,29 @@ class Profile extends React.Component {
     if (comments[0] == null || comments[1] == null || comments[2] == null){
       return;
     }
-    return <div><h4 style={{textAlign: "center"}}>Your top comments</h4><br/>
-    <div className="col-md-12" >
-        <div className="circle1">{this.state.data.top_comments[0].statement}</div>
-        <div className="circle2">{this.state.data.top_comments[1].statement}</div>
-        <div className="circle3">{this.state.data.top_comments[2].statement}</div>
-    </div></div>;
+return <div className="card">
+    <div className="card-header" style={{textAlign: "center"}}>Your top comments</div>
+      <ul className="list-group">
+        <li className="list-group-item">
+          <blockquote className="blockquote text-right">
+            <p className="mb-0">{this.state.data.top_comments[0].statement}</p>
+            <footer className="blockquote-footer">from <i><Link to={"/article/"+ comments[0].article_id["$oid"] + "/comments"}>{comments[0].title}</Link></i></footer>
+          </blockquote>
+        </li>
+        <li className="list-group-item text-right">
+          <blockquote className="blockquote">
+            <p className="mb-0">{this.state.data.top_comments[1].statement}</p>
+            <footer className="blockquote-footer">from <i><Link to={"/article/"+ comments[1].article_id["$oid"] + "/comments"}>{comments[1].title}</Link></i></footer>
+          </blockquote>
+        </li>
+        <li className="list-group-item text-right">
+          <blockquote className="blockquote">
+            <p className="mb-0">{this.state.data.top_comments[2].statement}</p>
+            <footer className="blockquote-footer">from <i><Link to={"/article/"+ comments[2].article_id["$oid"] + "/comments"}>{comments[2].title}</Link></i></footer>
+          </blockquote>
+        </li>
+      </ul>
+    </div>;
   }
 
 
@@ -489,10 +506,9 @@ class Profile extends React.Component {
       
 <br/>
   <div className="card">
-    <div className="card-header">{readHistory}</div>
+    <div className="card-header" style={{textAlign: "center"}}>{readHistory}</div>
     {this.toHtml(history)}
   </div>
-        
     <br/>
     {this.topComments()}
     </div>

@@ -399,8 +399,12 @@ def all_articles_source_cats():
     content = request.json
     print(content)
     user_id = ObjectId(content["user_id"]["$oid"])
-    top_comments = list(db.comments.find({"user_id": user_id}).sort([("thumbs_up", -1)]).limit(3))
-    print(top_comments)
+    top_comments = list(db.comments.aggregate([{ "$match": {"user_id": user_id}}
+    ,{"$project": {"article_id": 1, "thumbs_up": 1, "statement": 1}},
+    {"$sort": {"thumbs_up": -1}},
+    {"$limit": 3}, 
+    {"$lookup": {"from": "articles", "localField": "article_id", "foreignField": "_id", "as": "articles"}},
+    {"$project": {"title": "$articles.title", "thumbs_up": 1, "statement": 1, "article_id": 1}},]))
     x = list(
         db.users.aggregate([{
             "$match": {
