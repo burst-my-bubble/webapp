@@ -402,21 +402,33 @@ class Profile extends React.Component {
    </div>
    <div className="col-md-9">
      <div className="row">
-    
+    <div className="col-md-12">
+      <div className="card">
+        <div className="card-header">Summary</div>
+        <div className="card-body">{lastWeek.length} articles read this week and {topCategory} was {pronoun} favourite. {this.state.data.sources.length} different news sources read this week and {topSource} was {pronoun} top one.</div>
+      </div>
+      <br/>
+    </div>
    <div className="col-md-4">
-     <div className="card stat"><p style={{fontSize: "30px"}}>{streak} day streak</p>    
-     <br/>
+     <div className="card">
+    <div className="card-header">Leaderboard</div>
+     <div className="card-body">
       <table style={{fontSize: "20px"}}>
         <tr><td>1</td><td><img src="https://graph.facebook.com/834147103608464/picture?type=small"/></td><td>Hashan</td><td>200</td></tr>
         <tr><td>2</td><td><img src="https://graph.facebook.com/2830315710343819/picture?type=small"/></td><td>Hugo</td><td>4</td></tr>
         <tr><td>3</td><td><img src="https://graph.facebook.com/10214598360096105/picture?type=small"/></td><td>Jack</td><td>3</td></tr>
         <tr><td>4</td><td><img src="https://graph.facebook.com/2062703670502448/picture?type=small"/></td><td>Joe</td><td>2</td></tr>
-      </table>
+      </table></div>
       <br/><br/>
     </div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}><h1>{lastWeek.length}</h1></button> articles read this week and {topCategory} was {pronoun} favourite
+     <div className="card">
+       <div className="card-header">
+        Categories Breakdown
+       </div>
+       <div className="card-body">
+       <button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}></button>
       <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Categories</Modal.Title>
@@ -438,10 +450,13 @@ class Profile extends React.Component {
         </Pie>
         <Tooltip />
       </PieChart>
-     </div>
+      </div></div>
    </div>
    <div className="col-md-4">
-     <div className="card stat"><button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1>{this.state.data.sources.length}</h1></button> different news sources read this week and {topSource} was {pronoun} top one
+     <div className="card">
+       <div className="card-header">Sources Breakdown</div>
+       <div className="card-body">
+       <button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1></h1></button> 
       <Modal show={this.state.show2} onHide={this.handleClose2.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Sources</Modal.Title>
@@ -464,16 +479,16 @@ class Profile extends React.Component {
         </Pie>
         <Tooltip />
       </PieChart>
+      </div>
      </div>
    </div>
-    
    </div>
   
       
 <br/>
-  <h4>{readHistory}</h4>
-  <div className="stat">
-        {this.toHtml(history)}
+  <div className="card">
+    <div className="card-header">{readHistory}</div>
+    {this.toHtml(history)}
   </div>
         
     <br/>
@@ -489,12 +504,11 @@ class Profile extends React.Component {
 
   toHtml(articles) {
     var result = articles.map(article => {
-      return <tr key={article._id["$oid"]}>
-        <td><a href={"/article/" + article._id["$oid"] + "/comments"} onClick={() => this.markAsRead(article._id)}>{article.title}</a></td> 
-    </tr>});
-    return <table className="table table-sm table-bordered">
-      <tbody>{result}</tbody>
-    </table>;
+      return<li key={article._id["$oid"]} className="list-group-item"><a href={"/article/" + article._id["$oid"] + "/comments"} onClick={() => this.markAsRead(article._id)}>{article.title}</a></li> 
+    });
+    return <ul className="list-group list-group-flush">
+      {result}
+    </ul>;
   }
 
   sameDay(first, second) {
@@ -638,25 +652,28 @@ class Comments extends React.Component {
         <div className="outertable" style={{padding:"8px"}}>
           
           <div className="floatLeft">
-          <div className="card article" style={{boxShadow:"1px 1px 5px grey", padding:"5px"}}>
-
-            <p style={{textAlign:"center"}}>Supporting Comments</p>
+          <div className="card article">
+            <div className="card-header">Supporting Comments</div>
+            <div className="card-body">
             <table className="table table-bordered">
               <tbody>
                 {posComments}
               </tbody>
             </table>
             </div>
+            
+            </div>
           </div>
           <div className="floatRight">
-          <div className="card article" style={{boxShadow:"1px 1px 5px grey", padding:"5px"}}>
-          <p style={{textAlign:"center"}}>Opposing Comments</p>
+          <div className="card article">
+          <div className="card-header">Opposing Comments</div>
+          <div className="card-body">
             <table className="table table-bordered">
               <tbody>
                 {negComments}
               </tbody>
             </table>
-            </div>
+            </div></div>
           </div>
         </div>
         
@@ -1052,7 +1069,7 @@ class Home extends React.Component {
        }
 
       return <div className="col-md-3" key={id}>
-        <div className="card article" style={{boxShadow:"1px 1px 5px grey"}}>
+        <div className="card article" style={{}}>
           <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
             <img src={article.image_url} className="card-img-top"/>
           </a>
