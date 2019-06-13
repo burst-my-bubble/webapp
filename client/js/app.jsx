@@ -407,12 +407,15 @@ class Profile extends React.Component {
      <div className="card">
     <div className="card-header">How your friends are doing</div>
       <ul className="list-group">
-        <li className="list-group-item">#1 <img className="miniprofile" src="https://graph.facebook.com/834147103608464/picture?type=small"/> Hashan 
-        <h4><span className="badge badge-pill float-right badge-primary">5</span></h4>
+        <li className="list-group-item profile-row">#1 <img className="miniprofile" src="https://graph.facebook.com/834147103608464/picture?type=small"/> <span className="profile-name">Hashan</span>  
+        <span className="badge badge-pill profile-streak badge-primary">5</span>
 </li>
-        <li className="list-group-item">#2<img className="miniprofile" src="https://graph.facebook.com/2830315710343819/picture?type=small"/> Hugo 4 </li>
-        <li className="list-group-item">#3 <img className="miniprofile" src="https://graph.facebook.com/10214598360096105/picture?type=small"/> Jack 3</li>
-        <li className="list-group-item">#4 <img className="miniprofile" src="https://graph.facebook.com/2062703670502448/picture?type=small"/>  Joe 2</li>
+        <li className="list-group-item profile-row">#2<img className="miniprofile" src="https://graph.facebook.com/2830315710343819/picture?type=small"/> <span className="profile-name">Hugo</span>         <span className="badge badge-pill profile-streak badge-primary">4</span>
+ </li>
+        <li className="list-group-item profile-row">#3 <img className="miniprofile" src="https://graph.facebook.com/10214598360096105/picture?type=small"/> <span className="profile-name">Jack</span>          <span className="badge badge-pill profile-streak badge-primary">3</span>
+</li>
+        <li className="list-group-item profile-row">#4 <img className="miniprofile" src="https://graph.facebook.com/2062703670502448/picture?type=small"/>  <span className="profile-name">Joe</span>          <span className="badge badge-pill profile-streak badge-primary">2</span>
+</li>
       </ul>
     </div>
    </div>
