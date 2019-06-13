@@ -397,41 +397,37 @@ class Profile extends React.Component {
     return `color-scale-${value.count}`;
   }}
 />
+    <div className="card-body" style={{padding: "1em", textAlign: "center"}}>You're on a {streak} day streak Keep it up!</div>
      </div>
      
    </div>
    <div className="col-md-9">
      <div className="row">
-    <div className="col-md-12">
-      <div className="card">
-        <div className="card-header">Summary</div>
-        <div className="card-body">{lastWeek.length} articles read this week and {topCategory} was {pronoun} favourite. {this.state.data.sources.length} different news sources read this week and {topSource} was {pronoun} top one.</div>
-      </div>
-      <br/>
-    </div>
    <div className="col-md-4">
      <div className="card">
-    <div className="card-header">Leaderboard</div>
-     <div className="card-body">
-      <table style={{fontSize: "20px"}}>
-        <tr><td>1</td><td><img src="https://graph.facebook.com/834147103608464/picture?type=small"/></td><td>Hashan</td><td>200</td></tr>
-        <tr><td>2</td><td><img src="https://graph.facebook.com/2830315710343819/picture?type=small"/></td><td>Hugo</td><td>4</td></tr>
-        <tr><td>3</td><td><img src="https://graph.facebook.com/10214598360096105/picture?type=small"/></td><td>Jack</td><td>3</td></tr>
-        <tr><td>4</td><td><img src="https://graph.facebook.com/2062703670502448/picture?type=small"/></td><td>Joe</td><td>2</td></tr>
-      </table></div>
-      <br/><br/>
+    <div className="card-header">How your friends are doing</div>
+      <ul className="list-group">
+        <li className="list-group-item">#1 <img className="miniprofile" src="https://graph.facebook.com/834147103608464/picture?type=small"/> Hashan 
+        <h4><span className="badge badge-pill float-right badge-primary">5</span></h4>
+</li>
+        <li className="list-group-item">#2<img className="miniprofile" src="https://graph.facebook.com/2830315710343819/picture?type=small"/> Hugo 4 </li>
+        <li className="list-group-item">#3 <img className="miniprofile" src="https://graph.facebook.com/10214598360096105/picture?type=small"/> Jack 3</li>
+        <li className="list-group-item">#4 <img className="miniprofile" src="https://graph.facebook.com/2062703670502448/picture?type=small"/>  Joe 2</li>
+      </ul>
     </div>
    </div>
    <div className="col-md-4">
      <div className="card">
        <div className="card-header">
-        Categories Breakdown
+        Topics
+       <button style={{"padding": "0"}} className="btn btn-link float-right" onClick={() => this.setState({show: true})}>i</button>
        </div>
        <div className="card-body">
-       <button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show: true})}></button>
+         <h2 style={{textAlign: "left"}}>{lastWeek.length}</h2>
+         <p>articles read this week and <b>{topCategory}</b> was {pronoun} favourite.</p>
       <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
           <Modal.Header closeButton>
-            <Modal.Title>View Categories</Modal.Title>
+            <Modal.Title>Your Topic Breakdown</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <table className="table table-bordered">
@@ -454,9 +450,12 @@ class Profile extends React.Component {
    </div>
    <div className="col-md-4">
      <div className="card">
-       <div className="card-header">Sources Breakdown</div>
+       <div className="card-header">Sources
+       <button style={{"padding": "0" }} className="btn btn-link float-right" onClick={() => this.setState({show2: true})}>i</button> 
+       </div>
        <div className="card-body">
-       <button style={{"padding": "0", "textAlign": "left"}} className="btn btn-link" onClick={() => this.setState({show2: true})}><h1></h1></button> 
+        <h2>{this.state.data.sources.length}</h2>
+        <p>different news sources read this week and <b>{topSource}</b> was {pronoun} top one.</p>
       <Modal show={this.state.show2} onHide={this.handleClose2.bind(this)}>
           <Modal.Header closeButton>
             <Modal.Title>View Sources</Modal.Title>
