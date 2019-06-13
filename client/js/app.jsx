@@ -384,7 +384,7 @@ class Profile extends React.Component {
    <div className="col-md-3">
        <Sidebar id={this.props.id} _id={this.props._id} myid={this.props.myid}/>
 
-     <div className="stat">
+     <div className="card"> <div className="card-body">
      <CalendarHeatmap
   startDate={TODAY_365}
   endDate={TODAY}
@@ -398,6 +398,8 @@ class Profile extends React.Component {
   }}
 />
      </div>
+    
+     </div>
      
    </div>
    <div className="col-md-9">
@@ -409,7 +411,7 @@ class Profile extends React.Component {
       </div>
       <br/>
     </div>
-   <div className="col-md-4">
+   {/*<div className="col-md-4">
      <div className="card">
     <div className="card-header">Leaderboard</div>
      <div className="card-body">
@@ -421,8 +423,8 @@ class Profile extends React.Component {
       </table></div>
       <br/><br/>
     </div>
-   </div>
-   <div className="col-md-4">
+</div>*/}
+   <div className="col-md-6">
      <div className="card">
        <div className="card-header">
         Categories Breakdown
@@ -442,17 +444,16 @@ class Profile extends React.Component {
 
           </Modal.Body>
         </Modal>
-     <PieChart width={200} height={200}>
-        <Pie dataKey="value"  isAnimationActive={false} data={data2} cx={100} cy={100} outerRadius={80} fill="#8884d8">
+     <PieChart width={340} height={300}>
+        <Pie dataKey="value"  label={customLabel} isAnimationActive={false} data={data2} cx={170} cy={150} outerRadius={80} fill="#8884d8">
         {
             data2.map((entry, index) => <Cell key={`cell-${index}`} fill={COLOURS[index % COLOURS.length]} />)
           }
         </Pie>
-        <Tooltip />
       </PieChart>
       </div></div>
    </div>
-   <div className="col-md-4">
+   <div className="col-md-6">
      <div className="card">
        <div className="card-header">Sources Breakdown</div>
        <div className="card-body">
@@ -776,13 +777,13 @@ class Sidebar extends React.Component {
     var joinDate = new Date(this.state.data["joined"].$date);
 
     return <div>
-  <div className="sidebar stat">
+  <div className="card"> <div className="card-body">
   <img style={{maxWidth:"100%", borderRadius:"150px"}} src={"https://graph.facebook.com/" + this.state.data.id + "/picture?width=900"}/>
     <br/><br/>
     <h2 style={{textAlign:"center"}}>{this.state.data["name"]}</h2>
     <p style={{textAlign:"center"}}>Bursting since {joinDate.toDateString().split(' ').slice(1).join(' ')}</p>
     <p style={{textAlign:"center"}}>"{this.state.data.status}" {button} </p>
-  </div>
+  </div></div>
   <br/>
   <Modal show={this.state.show} onHide={this.handleClose.bind(this)}>
       <Modal.Header closeButton>
@@ -931,11 +932,20 @@ class Settings extends React.Component {
       </button>;
     });
     return <div className="container">
-      <br/><label>Filter which categories you wish to see:</label>
+      <div className="card">
+        <div className="card-header">
+          Settings
+        </div>
+        <div className="card-body">
+        <label>Filter which categories you wish to see:</label>
       <div className="list-group">
         {categories}
       </div>
-      <button style={{marginTop: "10px"}} className="btn btn-primary">Save</button>
+      </div>
+      <div className="card-footer">
+        <button className="btn btn-primary">Save</button>
+      </div>
+      </div>
     </div>;
   }
 }
