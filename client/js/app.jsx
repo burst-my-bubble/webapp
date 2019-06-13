@@ -287,8 +287,14 @@ class Profile extends React.Component {
     if (comments[0] == null || comments[1] == null || comments[2] == null){
       return;
     }
+    var n = "";
+    if (this.props.myid["$oid"] === this.props._id["$oid"]) {
+      n = "Your"
+    } else {
+      n = this.getFirstName(this.state.data2["name"]) + "'s"
+    }
 return <div className="card">
-    <div className="card-header" style={{textAlign: "center"}}>Your top comments</div>
+    <div className="card-header" style={{textAlign: "center"}}>{n} top comments</div>
       <ul className="list-group">
         <li className="list-group-item">
           <blockquote className="blockquote text-right" style={{marginBottom: "0"}}>
@@ -319,12 +325,18 @@ return <div className="card">
     }
     var readHistory = "";
     var pronoun = "";
+    var n = "";
+    var streak_msg = "";
     if (this.props.myid["$oid"] === this.props._id["$oid"]) {
       readHistory = "What you've been reading recently";
       pronoun = "your";
+      n = "your"
+      streak_msg = "You're on a " + streak + "day streak Keep it up!"
     } else {
       readHistory = "What " + this.getFirstName(this.state.data2["name"]) + "'s been reading recently";
       pronoun = "their";
+      n = this.getFirstName(this.state.data2["name"]) + "'s"
+      streak_msg =  this.getFirstName(this.state.data2["name"]) + "'s on a " + streak + "day streak!"
     }
     var articles = this.state.data.history.sort((a, b) => 
       b.access_time["$date"] - a.access_time["$date"]
@@ -422,7 +434,7 @@ return <div className="card">
      <div className="row">
    <div className="col-md-4">
      <div className="card">
-    <div className="card-header">How your friends are doing</div>
+    <div className="card-header">How {n} friends are doing</div>
       <ul className="list-group list-group-flush">
         <li className="list-group-item profile-row">#1 <img className="miniprofile" src="https://graph.facebook.com/834147103608464/picture?type=small"/> <span className="profile-name">Hashan</span>  
         <span className="badge badge-pill profile-streak badge-primary">5</span>
