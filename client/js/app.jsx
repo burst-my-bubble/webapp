@@ -406,7 +406,7 @@ class Profile extends React.Component {
    <div className="col-md-4">
      <div className="card">
     <div className="card-header">How your friends are doing</div>
-      <ul className="list-group">
+      <ul className="list-group list-group-flush">
         <li className="list-group-item profile-row">#1 <img className="miniprofile" src="https://graph.facebook.com/834147103608464/picture?type=small"/> <span className="profile-name">Hashan</span>  
         <span className="badge badge-pill profile-streak badge-primary">5</span>
 </li>
