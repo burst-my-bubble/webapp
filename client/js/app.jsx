@@ -695,8 +695,6 @@ class Comments extends React.Component {
             {negComments}
          </div>
         </div>
-        
-
         <br></br>
 
 
