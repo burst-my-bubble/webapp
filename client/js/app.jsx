@@ -633,7 +633,7 @@ class Comments extends React.Component {
        <tr key={_id["$oid"]}>
          <td>{statement}</td>
          <td>{this.getFirstName(user[0].name)}</td>
-         <td><p id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
+         <td><p style={{cursor:"hand"}}id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
        </tr>);
     }
 
