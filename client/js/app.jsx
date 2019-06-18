@@ -630,11 +630,11 @@ class Comments extends React.Component {
       posComments = <p style={{textAlign:"center"}}>Nobody seems to have voiced their opinion yet, why don't you be the first?</p>;
     } else {
       posComments = article.posComments.map(({user_id, thumbs_up, against, statement, _id, article_id, user}) => 
-       <tr key={_id["$oid"]}>
-         <td>{statement}</td>
-         <td>{this.getFirstName(user[0].name)}</td>
-         <td><p id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
-       </tr>);
+       <blockquote className="quote-card" key={_id["$oid"]}>
+         <p style={{cursor:"hand"}} className="float-right" id={_id} onClick={() => this.thumbs_up(_id)}>👍</p>
+         <p>{statement}</p>
+         <cite>{this.getFirstName(user[0].name)}</cite>
+       </blockquote>);
     }
 
     console.log(article.negComments);
@@ -643,11 +643,11 @@ class Comments extends React.Component {
       negComments = <p style={{textAlign:"center"}}>Nobody seems to have voiced their opinion yet, why don't you be the first?</p>;
     } else {
       negComments = article.negComments.map(({user_id, thumbs_up, against, statement, _id, article_id, user}) => 
-       <tr key={_id["$oid"]}>
-         <td>{statement}</td>
-         <td>{this.getFirstName(user[0].name)}</td>
-         <td><p id={_id} onClick={() => this.thumbs_up(_id)}>👍</p></td>
-       </tr>);
+       <blockquote className="quote-card" key={_id["$oid"]} style={{backgroundColor: "#efa84e"}}>
+         <p id={_id} className="float-right" onClick={() => this.thumbs_up(_id)}>👍</p>
+         <p>{statement}</p>
+         <cite>{this.getFirstName(user[0].name)}</cite>
+       </blockquote>);
     }
 
       const top3pos = <div style = {{display: "flex", flexDirection: "row", justifyContent: "center",}}>{article.top3pos.map(({user_id, thumbs_up, against, statement, _id, article_id, user}, index) => 
@@ -658,8 +658,10 @@ class Comments extends React.Component {
       <div className={"circle" + (parseInt(index)+1)} dangerouslySetInnerHTML={{ __html:"<i>'" + statement+ "'</i> - " + this.getFirstName(user[0].name)}}></div>
       )}</div>
 
-    return <div className="container">
-
+    return <div className="container ">
+      <br/>
+      <div className="card">
+        <div className="card-body">
     <div className="row">
       <div className="col-md-3">
         <a onClick={() => this.markAsRead(article._id)} target="_blank" href={article.url}>
@@ -677,39 +679,22 @@ class Comments extends React.Component {
         </p>
         <span className="label badge badge-primary badge-primary">{dstr}</span>          
 
-      </div>
+      </div></div>
     </div>
-        <br></br>
-        <h4>Here's what people are saying...</h4>
+    </div>
+    <br/>
+    <br/>
         <div className="outertable" style={{padding:"8px"}}>
           
           <div className="floatLeft">
-          <div className="card article">
-            <div className="card-header">Supporting Comments</div>
-            <div className="card-body">
-            <table className="table table-bordered">
-              <tbody>
-                {posComments}
-              </tbody>
-            </table>
-            </div>
-            
-            </div>
+            <h4>Supporting Opinions</h4>
+            {posComments}
           </div>
           <div className="floatRight">
-          <div className="card article">
-          <div className="card-header">Opposing Comments</div>
-          <div className="card-body">
-            <table className="table table-bordered">
-              <tbody>
-                {negComments}
-              </tbody>
-            </table>
-            </div></div>
-          </div>
+            <h4>Opposing Opinions</h4>
+            {negComments}
+         </div>
         </div>
-        
-
         <br></br>
 
 
