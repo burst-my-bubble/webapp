@@ -117,7 +117,7 @@ def sortByScore(val):
     return -val["score"]
 
 def get_articles_given_entity(entity, skip):
-    return list(db.articles.find({"entities.name": entity["name"]}))[skip: skip+12]
+    return list(db.articles.find({"entities.name": entity["name"]}, sort=[("published_date", -1)]))[skip: skip+12]
 
 def get_trending_entities():
     return list(db.entities.find({"bl": False}, {"name": 1, "score": 1}).sort([("score", -1)]).limit(100))
